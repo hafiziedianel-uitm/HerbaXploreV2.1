@@ -9,6 +9,11 @@ export type Compound = {
   therapeuticActivity: string;
   structure2DPlaceholder: string;
   structure3DPlaceholder: string;
+  functionalGroups?: {
+    name: string;
+    description: string;
+  }[];
+  keyFact?: string;
   pharmaceuticalAnalysis?: {
     molecularWeight: string;
     nominalMass: string;
@@ -207,6 +212,13 @@ export const plantsData: Plant[] = [
             therapeuticActivity: "Used in managing oxidative stress-related diseases, inflammation, kidney stones, urinary tract health, and as a natural preservative.",
             structure2DPlaceholder: "https://picsum.photos/seed/rosmarinic2d/300/200",
             structure3DPlaceholder: "Upload .pdb or .pdbqt for Rosmarinic Acid 3D view",
+            functionalGroups: [
+              { name: "Catechol rings", description: "Two ortho-dihydroxybenzene (catechol) rings provide potent antioxidant activity by donating hydrogen atoms to free radicals." },
+              { name: "Ester linkage", description: "Connects the caffeic acid and 3,4-dihydroxyphenyllactic acid moieties; susceptible to hydrolysis in the gut." },
+              { name: "Carboxylic acid", description: "Contributes to the molecule's acidity and interacts with polar residues in protein targets." },
+              { name: "Unsaturated alkene", description: "The alpha,beta-unsaturated double bond adds to the extended conjugation and electron delocalization." }
+            ],
+            keyFact: "Despite its name, it is a derivative of caffeic acid, widely recognized as one of the most potent natural antioxidants found in the Lamiaceae (mint) family.",
             pharmaceuticalAnalysis: {
               molecularWeight: "360.31 g/mol",
               nominalMass: "360 Da",
@@ -320,6 +332,12 @@ export const plantsData: Plant[] = [
             therapeuticActivity: "Used for digestive disorders and as an antimicrobial agent.",
             structure2DPlaceholder: "https://picsum.photos/seed/cinnamaldehyde2d/300/200",
             structure3DPlaceholder: "Interactive 3D view for Cinnamaldehyde",
+            functionalGroups: [
+              { name: "Aldehyde group", description: "The highly reactive carbonyl carbon can form Schiff bases with proteins, accounting for its antimicrobial action." },
+              { name: "Conjugated double bond", description: "Connects the phenyl ring to the aldehyde, giving the molecule stability and its yellowish color." },
+              { name: "Aromatic ring", description: "Enhances the lipophilicity, allowing the compound to penetrate bacterial cell membranes." }
+            ],
+            keyFact: "Its distinctive flavor and scent come from the combination of the aromatic ring conjugated directly with the aldehyde group, making it an essential spice in culinary traditions worldwide.",
             pharmaceuticalAnalysis: {
               molecularWeight: "132.16 g/mol",
               nominalMass: "132 Da",

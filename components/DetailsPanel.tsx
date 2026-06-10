@@ -1025,6 +1025,36 @@ export function DetailsPanel({
                 </section>
               )}
 
+              {/* Structural Key Facts & Functional Groups */}
+              {compound.keyFact && (
+                <section>
+                  <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Info size={16} />
+                    {language === 'ms' ? 'Fakta Penting' : 'Key Structural Fact'}
+                  </h3>
+                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800/50 p-5 transition-colors duration-300">
+                    <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-medium italic">"{translateDb(compound.keyFact, language)}"</p>
+                  </div>
+                </section>
+              )}
+
+              {compound.functionalGroups && compound.functionalGroups.length > 0 && (
+                <section>
+                  <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Network size={16} />
+                    {language === 'ms' ? 'Kumpulan Berfungsi' : 'Key Functional Groups'}
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {compound.functionalGroups.map((group, idx) => (
+                      <div key={idx} className="bg-stone-50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-100 dark:border-stone-700 transition-colors duration-300 hover:border-emerald-500/50">
+                        <div className="font-bold text-stone-800 dark:text-stone-200 mb-1">{translateDb(group.name, language)}</div>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{translateDb(group.description, language)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* Pharmacological Activity */}
               <section>
                 <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
