@@ -182,6 +182,11 @@ export const plantsData: Plant[] = [
           {
             id: "caffeic-acid",
             name: "Caffeic Acid",
+            functionalGroups: [
+              { name: "Catechol ring", description: "O-diphenol structure responsible for high antioxidant and free-radical scavenging activity." },
+              { name: "Alpha, beta-unsaturated carboxylic acid", description: "Acrylic acid side chain providing additional conjugation and points of reactivity." }
+            ],
+            keyFact: "Synthesized in plants via the shikimate pathway, caffeic acid is a key intermediate in the biosynthesis of lignin and other complex polyphenols.",
             pdbId: "4N0S",
             pharmacologicalActivity: "Strong antioxidant and immunomodulatory effects.",
             therapeuticActivity: "Supports immune system and protects against cellular damage.",
@@ -231,6 +236,11 @@ export const plantsData: Plant[] = [
           {
             id: "sinensetin",
             name: "Sinensetin",
+            functionalGroups: [
+              { name: "Flavone core", description: "A benzo-gamma-pyrone backbone typical of flavones, contributing to anti-inflammatory properties." },
+              { name: "Methoxy groups", description: "Five methoxy groups make this flavonoid highly lipophilic compared to typical polyhydroxylated flavonoids." }
+            ],
+            keyFact: "A polymethoxyflavone characteristically found in Orthosiphon stamineus, showing promising antiangiogenic and antitumour activities.",
             hide3D: true,
             pharmacologicalActivity: "Potent diuretic, anti-inflammatory, and anti-tumor activities.",
             therapeuticActivity: "Helps in treating kidney stones, edema, and exhibits potential in cancer therapy.",
@@ -248,6 +258,11 @@ export const plantsData: Plant[] = [
           {
             id: "eupatorin",
             name: "Eupatorin",
+            functionalGroups: [
+              { name: "Flavone core", description: "The central bicyclic ring structure that provides the pharmacological scaffold." },
+              { name: "Phenolic hydroxyl and Methoxy groups", description: "A combination of substituents that balances lipophilicity with hydrogen-bonding capacity." }
+            ],
+            keyFact: "Eupatorin is one of the lipophilic flavonoids present in Misai Kucing, often used as a marker for the standardization of its extracts.",
             hide3D: true,
             pharmacologicalActivity: "Vasodilatory, anti-proliferative, and anti-inflammatory.",
             therapeuticActivity: "Potential use in cardiovascular health and cancer prevention.",
@@ -291,6 +306,11 @@ export const plantsData: Plant[] = [
           {
             id: "nicotine",
             name: "Nicotine",
+            functionalGroups: [
+              { name: "Pyridine ring", description: "An aromatic heterocyclic nitrogen ring." },
+              { name: "Pyrrolidine ring", description: "An aliphatic five-membered ring containing a basic tertiary amine, largely protonated at physiological pH." }
+            ],
+            keyFact: "A potent parasympathomimetic alkaloid produced in the roots of nightshade plants and accumulated in the leaves as a defense against herbivores.",
             pdbId: "9LHA",
             pharmacologicalActivity: "Potent neuroactive and insecticidal properties. antimicrobial, antifungal, insecticidal, antioxidant, anti-inflammatory, and cytotoxic activities.",
             therapeuticActivity: "Used in agricultural pesticides and nicotine replacement therapies.",
@@ -327,6 +347,11 @@ export const plantsData: Plant[] = [
           {
             id: "cinnamaldehyde",
             name: "Cinnamaldehyde",
+            functionalGroups: [
+              { name: "Aldehyde group", description: "Reactive carbonyl group that contributes to the compound's aroma and antimicrobial properties." },
+              { name: "Conjugated double bond", description: "Connects the aromatic ring to the aldehyde, providing stability and characteristic flavor." }
+            ],
+            keyFact: "The primary compound giving cinnamon its flavor and odor, it occurs naturally as predominantly the trans-isomer.",
             pdbId: "6AHL",
             pharmacologicalActivity: "Antispasmodic, antimicrobial, and potential antiulcer properties.",
             therapeuticActivity: "Used for digestive disorders and as an antimicrobial agent.",
@@ -369,6 +394,11 @@ export const plantsData: Plant[] = [
           {
             id: "myristicin",
             name: "Myristicin",
+            functionalGroups: [
+              { name: "Methylenedioxy ring", description: "A characteristic bridging ether group attached to the aromatic ring." },
+              { name: "Allyl side chain", description: "An unsaturated hydrocarbon tail typical of phenylpropanoids." }
+            ],
+            keyFact: "A naturally occurring psychoactive and anticholinergic compound from nutmeg; essentially a precursor for empathogenic amphetamines in clandestine synthesis.",
             hide3D: true,
             pharmacologicalActivity: "Antimicrobial, anti-inflammatory; hallucinogenic at high doses.",
             therapeuticActivity: "Used for digestive disorders and historically for pain relief.",
@@ -405,6 +435,11 @@ export const plantsData: Plant[] = [
           {
             id: "anethole",
             name: "Anethole",
+            functionalGroups: [
+              { name: "Methoxy group", description: "Electron-donating ether group on the phenyl ring." },
+              { name: "Propenyl side chain", description: "An unsaturated chain that gives the compound its characteristic licorice flavor (predominantly the trans-isomer)." }
+            ],
+            keyFact: "The chief flavour component of anise and star anise, it is notably much sweeter than sugar and has mild antimicrobial properties.",
             pdbId: "8S1J",
             pharmacologicalActivity: "Antispasmodic, carminative, and expectorant.",
             therapeuticActivity: "Relieves bloating, coughs, and acts as a mild digestive tonic.",
@@ -441,6 +476,11 @@ export const plantsData: Plant[] = [
           {
             id: "aloin",
             name: "Aloin",
+            functionalGroups: [
+              { name: "Anthrone core", description: "Partially reduced anthraquinone framework, associated with powerful laxative effects." },
+              { name: "C-glycoside", description: "Sugar attached directly via a carbon-carbon bond, making it resistant to acid hydrolysis in the stomach." }
+            ],
+            keyFact: "Found in aloe latex, aloin is a pro-drug; it must be metabolized by intestinal flora into aloe-emodin anthrone to exert its laxative effect.",
             hide3D: true,
             pharmacologicalActivity: "Wound healing, anti-inflammatory, and strong laxative effects.",
             therapeuticActivity: "Used for short-term constipation relief.",
@@ -477,6 +517,11 @@ export const plantsData: Plant[] = [
           {
             id: "ricinoleic-acid",
             name: "Ricinoleic acid",
+            functionalGroups: [
+              { name: "Secondary alcohol", description: "Hydroxy group at Carbon 12, imparting unusual polarity and viscosity to the oil." },
+              { name: "Alkene", description: "A cis double bond at Carbon 9, contributing to its liquid state at room temperature." }
+            ],
+            keyFact: "Accounts for about 90% of the fatty acid content in castor oil, making it uniquely soluble in alcohol and useful as a potent laxative and industrial lubricant.",
             pdbId: "2CM4",
             pharmacologicalActivity: "Stimulant laxative, emollient, lubricant.",
             therapeuticActivity: "Used heavily in pharmaceutical vehicles and as an active laxative.",
@@ -513,6 +558,11 @@ export const plantsData: Plant[] = [
           {
             id: "alginic-acid",
             name: "Alginic Acid",
+            functionalGroups: [
+              { name: "Carboxylic acids", description: "Uronic acid residues (mannuronic and guluronic) capable of cross-linking with divalent cations like calcium." },
+              { name: "Glycosidic bonds", description: "Beta-1,4 and alpha-1,4 linkages forming the backbone of this linear copolymer." }
+            ],
+            keyFact: "A structural polysaccharide from brown algae cell walls; it uniquely forms a stable gel egg-box structure in the presence of calcium ions, used in antacids like Gaviscon.",
             pdbId: "4OZV",
             pharmacologicalActivity: "Thickening agent, suspending agent, tablet binder, wound dressing, dental impression material.",
             therapeuticActivity: "Used in antacids to form a protective raft, and as a hydrophilic excipient.",
@@ -549,6 +599,11 @@ export const plantsData: Plant[] = [
           {
             id: "carrageenan",
             name: "Carrageenan",
+            functionalGroups: [
+              { name: "Sulfate ester groups", description: "Highly anionic sulfate groups conferring water solubility and reactivity with proteins." },
+              { name: "Galactopyranose backbone", description: "Alternating D-galactose and 3,6-anhydrogalactose units." }
+            ],
+            keyFact: "Depending on the number of sulfates (kappa, iota, lambda), carrageenans form different gel textures; widely used as vegetarian thickening agents in the food industry.",
             hide3D: true,
             pharmacologicalActivity: "Pharmaceutical suspensions, gels, food stabilizers.",
             therapeuticActivity: "Gelling, stabilizing, emulsifying agent.",
@@ -566,6 +621,11 @@ export const plantsData: Plant[] = [
           {
             id: "agarose",
             name: "Agarose",
+            functionalGroups: [
+              { name: "Hydroxyl groups", description: "Extensive networks of OH groups allow massive intermolecular hydrogen bonding." },
+              { name: "Anhydro bridge", description: "The 3,6-anhydro-L-galactopyranose unit limits conformational flexibility, promoting strong gelation." }
+            ],
+            keyFact: "The primary non-sulfated, gelling fraction of agar, heavily used in molecular biology for DNA gel electrophoresis due to its neutral and porous structure.",
             hide3D: true,
             pharmacologicalActivity: "Laxative, culture media, suspending agent, suppository base.",
             therapeuticActivity: "Acts as a bulk laxative and suspending agent.",
@@ -602,6 +662,11 @@ export const plantsData: Plant[] = [
           {
             id: "pectin",
             name: "Pectin",
+            functionalGroups: [
+              { name: "Galacturonic acid backbone", description: "Carboxylic acid groups that can be partially methyl-esterified, determining the conditions (sugar/acid) under which it gels." },
+              { name: "Methoxy esters", description: "Determine whether the pectin is high-methoxy or low-methoxy." }
+            ],
+            keyFact: "Abundant in the cell walls of non-woody plant parts (like citrus peels and apples), pectin is the classic gelling agent used to make household jams and jellies.",
             hide3D: true,
             pharmacologicalActivity: "Gelling agent, stabilizer. Antidiarrheal preparations.",
             therapeuticActivity: "Used as a gelling agent and in antidiarrheal formulations.",
@@ -638,6 +703,11 @@ export const plantsData: Plant[] = [
           {
             id: "sterculia-polysaccharide",
             name: "Sterculia Polysaccharide",
+            functionalGroups: [
+              { name: "Acetyl groups", description: "Sterculia gum is notably partially acetylated, distinguishing it from gum arabic and giving it a faint vinegar-like smell." },
+              { name: "Uronic acid groups", description: "Galacturonic and glucuronic acids offering a polyanionic character." }
+            ],
+            keyFact: "Also known as Karaya gum, it is a bulk-forming laxative that absorbs water to swell significantly, making it useful in colostomy appliances and dental adhesives.",
             hide3D: true,
             pharmacologicalActivity: "Bulk laxative, tablet binder, thickener.",
             therapeuticActivity: "Used as a bulk-forming laxative.",
@@ -674,6 +744,11 @@ export const plantsData: Plant[] = [
           {
             id: "arabin",
             name: "Arabin / Arabic acid salts",
+            functionalGroups: [
+              { name: "Highly branched polysaccharide complex", description: "Containing arabinose, galactose, rhamnose, and glucuronic acid; highly water-soluble." },
+              { name: "Glycoprotein fraction", description: "A small protein component linked to the carbohydrates, crucial for its excellent emulsifying properties." }
+            ],
+            keyFact: "Gum arabic (from Acacia senegal) is a truly unique exudate that dissolves easily in cold water (unlike most gums) and is the standard emulsifier for essential oils in beverages.",
             pdbId: "3A23",
             pharmacologicalActivity: "Emulsifier, suspending agent, binder, demulcent.",
             therapeuticActivity: "Pharmaceutical excipient for stabilization.",
@@ -710,6 +785,10 @@ export const plantsData: Plant[] = [
           {
             id: "tragacanthin",
             name: "Tragacanthin",
+            functionalGroups: [
+              { name: "Water-soluble arabinogalactan", description: "Neutral, highly branched oligo- and polysaccharides." }
+            ],
+            keyFact: "One of the two main components of Tragacanth gum, providing the water-soluble fraction that yields colloidal solutions.",
             hide3D: true,
             pharmacologicalActivity: "Water-soluble demulcent and emulsion stabilizer.",
             therapeuticActivity: "Strong viscosifying and suspending properties, used as a stabilizer in food and pharmacy.",
@@ -727,6 +806,10 @@ export const plantsData: Plant[] = [
           {
             id: "bassorin",
             name: "Bassorin",
+            functionalGroups: [
+              { name: "Methoxylated polygalacturonic acid", description: "Acidic, water-insoluble complex polysaccharide that swells immensely in water." }
+            ],
+            keyFact: "Accounts for 60-70% of Tragacanth gum; it doesnt dissolve but swells to form an extremely viscous gel, used traditionally as a suspending agent in pharmacy.",
             hide3D: true,
             pharmacologicalActivity: "Water-insoluble fraction that swells extensively in water to form a highly viscous gel.",
             therapeuticActivity: "Thickening agent, stabilizer, and visual texture enhancer in suspensions.",
@@ -763,6 +846,11 @@ export const plantsData: Plant[] = [
           {
             id: "arabinoxylans",
             name: "Arabinoxylans",
+            functionalGroups: [
+              { name: "Xylan backbone", description: "Beta-1,4-linked xylose units." },
+              { name: "Arabinose side branches", description: "Alpha-L-arabinofuranose residues that hold water tightly." }
+            ],
+            keyFact: "The primary mucilaginous component of Psyllium seed husk, acting as a powerful mechanical bulk laxative by absorbing water and expanding in the gut.",
             pdbId: "3C7H",
             pharmacologicalActivity: "Bulk-forming laxative.",
             therapeuticActivity: "Constipation treatment, bowel regulators.",
@@ -799,6 +887,11 @@ export const plantsData: Plant[] = [
           {
             id: "oleic-acid",
             name: "Oleic Acid",
+            functionalGroups: [
+              { name: "Cis-alkene", description: "A double bond at C9 (omega-9) introducing a kink in the fatty acid chain, thus lowering its melting point." },
+              { name: "Carboxylic acid", description: "Terminal polar group allowing for esterification into triglycerides." }
+            ],
+            keyFact: "A monounsaturated omega-9 fatty acid that constitutes the majority of olive oils lipid profile, widely praised for its cardiovascular benefits.",
             pdbId: "2WQ9",
             pharmacologicalActivity: "Emollient, laxative, vehicle for injections, ointment base, skin protectant.",
             therapeuticActivity: "Used as a pharmaceutical vehicle and emollient.",
@@ -835,6 +928,10 @@ export const plantsData: Plant[] = [
           {
             id: "alpha-linolenic-acid",
             name: "α-Linolenic acid",
+            functionalGroups: [
+              { name: "Tri-unsaturated chain", description: "Contains three cis double bonds (omega-3, -6, and -9 positions), making it highly fluid and prone to oxidation." }
+            ],
+            keyFact: "An essential omega-3 fatty acid found at high levels in flaxseed; our bodies cannot synthesize it, yet its crucial for inflammation regulation and cardiovascular health.",
             pdbId: "7FFX",
             pharmacologicalActivity: "Nutritional supplement, emollient, source of essential fatty acids.",
             therapeuticActivity: "Source of omega-3.",
@@ -871,6 +968,10 @@ export const plantsData: Plant[] = [
           {
             id: "stearic-acid",
             name: "Stearic acid",
+            functionalGroups: [
+              { name: "Saturated aliphatic chain", description: "An 18-carbon fully saturated chain allowing molecules to pack tightly together." }
+            ],
+            keyFact: "One of the most common saturated fatty acids; solid at room temperature, it gives cocoa butter (and chocolate) its distinctive melting profile near body temperature.",
             pdbId: "4WBK",
             percent: 34.5,
             pharmacologicalActivity: "Saturated fatty acid. Plays a critical role in providing solidity and texture to cocoa butter at room temperature.",
@@ -907,6 +1008,10 @@ export const plantsData: Plant[] = [
           {
             id: "palmitic-acid",
             name: "Palmitic acid",
+            functionalGroups: [
+              { name: "Saturated aliphatic chain", description: "16 carbons, straight-chain." }
+            ],
+            keyFact: "The most common saturated fatty acid in animals and plants; named after palm oil, where it is highly abundant.",
             pdbId: "6QGS",
             percent: 26.0,
             pharmacologicalActivity: "Common saturated fatty acid. Contributes to solidity and high stability against lipid oxidation.",
@@ -925,6 +1030,10 @@ export const plantsData: Plant[] = [
           {
             id: "linoleic-acid",
             name: "Linoleic acid",
+            functionalGroups: [
+              { name: "Di-unsaturated chain", description: "Two cis double bonds (at omega-6 and omega-9)." }
+            ],
+            keyFact: "An essential omega-6 fatty acid necessary for human diet, heavily present in many seed oils and serving as a biosynthetic precursor to arachidonic acid.",
             pdbId: "7WDJ",
             percent: 3.2,
             pharmacologicalActivity: "Essential polyunsaturated omega-6 fatty acid. Enhances skin penetration and exhibits mild anti-inflammatory properties.",
@@ -943,6 +1052,10 @@ export const plantsData: Plant[] = [
           {
             id: "arachidic-acid",
             name: "Arachidic acid",
+            functionalGroups: [
+              { name: "Saturated tail", description: "20 carbons long, providing strong hydrophobicity." }
+            ],
+            keyFact: "A minor but globally distributed saturated fatty acid, originally isolated from peanuts (Arachis hypogaea).",
             pdbId: "7X4J",
             percent: 1.0,
             pharmacologicalActivity: "Long-chain saturated fatty acid found in minor parts. Provides emulsification enhancement and fine crystallization consistency.",
@@ -980,6 +1093,11 @@ export const plantsData: Plant[] = [
           {
             id: "rutin",
             name: "Rutin (Quercetin-3-O-rutinoside)",
+            functionalGroups: [
+              { name: "Flavonol core", description: "Quercetin skeleton featuring multiple phenolic OH groups (excellent antioxidant)." },
+              { name: "Rutinoside disaccharide", description: "Glucose and rhamnose attached at the C3 oxygen, rendering it water-soluble." }
+            ],
+            keyFact: "Often dubbed Vitamin P, rutin is historically used to strengthen blood vessels and decrease capillary permeability in conditions like venous insufficiency.",
             pdbId: "1RY8",
             pharmacologicalActivity: "Antioxidant, Anti-inflammatory, Vasoprotective, Anticancer, Anti-diabetic.",
             therapeuticActivity: "Capillary protectant.",
@@ -1016,6 +1134,11 @@ export const plantsData: Plant[] = [
           {
             id: "salicylic-acid",
             name: "Salicylic acid",
+            functionalGroups: [
+              { name: "Phenolic hydroxyl", description: "Ortho to the carboxylic acid, enabling intramolecular hydrogen bonding." },
+              { name: "Carboxylic acid", description: "Provides acidic nature and allows formation of salts and esters." }
+            ],
+            keyFact: "The natural plant hormone that spurred the synthesis of Aspirin (acetylsalicylic acid); acts mechanically as a keratolytic agent for warts and chemically as an anti-inflammatory.",
             pdbId: "5F1A",
             pharmacologicalActivity: "Analgesic, Antimicrobial and antipyretic.",
             therapeuticActivity: "Pain relief, fever reducer.",
@@ -1052,6 +1175,11 @@ export const plantsData: Plant[] = [
           {
             id: "salicin",
             name: "Salicin",
+            functionalGroups: [
+              { name: "Phenolic glycoside", description: "Glucose bound to Salicyl alcohol." },
+              { name: "Primary alcohol", description: "On the benzyl position, which undergoes oxidation inside the body." }
+            ],
+            keyFact: "The classic active principle of Willow bark; it is a pro-drug that gut bacteria and liver enzymes convert into the active anti-inflammatory agent, salicylic acid.",
             pdbId: "9K6L",
             pharmacologicalActivity: "Analgesic, anti-inflammatory.",
             therapeuticActivity: "Natural alternative for pain relief.",
@@ -1088,6 +1216,11 @@ export const plantsData: Plant[] = [
           {
             id: "benzyl-benzoate",
             name: "Benzyl benzoate",
+            functionalGroups: [
+              { name: "Ester linkage", description: "Connects a benzyl alcohol moiety with a benzoic acid moiety." },
+              { name: "Aromatic rings", description: "Two unfused benzene rings making the compound quite lipophilic." }
+            ],
+            keyFact: "A major component of Peruvian Balsam; topically applied, it is a highly effective, historical treatment for scabies and lice infestations.",
             hide3D: true,
             pharmacologicalActivity: "Antiseptic and vulnerary.",
             therapeuticActivity: "Treatment of minor wounds, burns, and ulcers.",
@@ -1105,6 +1238,11 @@ export const plantsData: Plant[] = [
           {
             id: "cinnamic-acid",
             name: "Cinnamic Acid",
+            functionalGroups: [
+              { name: "Alpha, beta-unsaturated acid", description: "Resonance-stabilized carboxylic acid system." },
+              { name: "Phenyl ring", description: "Simple aromatic moiety without hydroxyl groups." }
+            ],
+            keyFact: "A central metabolic intermediate constructed from phenylalanine by the enzyme PAL; its derivatives form defense compounds and structural lignins.",
             pdbId: "4GM7",
             pharmacologicalActivity: "Antiseptic and expectorant.",
             therapeuticActivity: "Used in cough syrups.",
@@ -1141,6 +1279,10 @@ export const plantsData: Plant[] = [
           {
             id: "benzoic-acid",
             name: "Benzoic Acid",
+            functionalGroups: [
+              { name: "Aromatic carboxylic acid", description: "Simplest aromatic acid." }
+            ],
+            keyFact: "A naturally occurring antimicrobial agent abundant in gum benzoin; frequently utilized in modern medicine and food as a standard preservative.",
             pdbId: "2Q0I",
             pharmacologicalActivity: "Antiseptic.",
             therapeuticActivity: "Used topically for antiseptic properties.",
@@ -1158,6 +1300,11 @@ export const plantsData: Plant[] = [
           {
             id: "coniferyl-benzoate",
             name: "Coniferyl benzoate",
+            functionalGroups: [
+              { name: "Coniferyl alcohol moiety", description: "A classic monolignol exhibiting a phenolic OH and a methoxy group." },
+              { name: "Benzoate ester", description: "Esterified at the primary alcohol of the coniferyl tail." }
+            ],
+            keyFact: "The predominant compound representing up to 80% of Siam Benzoin resin, contributing to its rich vanilla/balsamic aroma heavily favored in perfumery.",
             hide3D: true,
             pharmacologicalActivity: "Antiseptic and vulnerary.",
             therapeuticActivity: "Wound healing and perfumery.",
@@ -1194,6 +1341,11 @@ export const plantsData: Plant[] = [
           {
             id: "methyl-salicylate",
             name: "Methyl salicylate",
+            functionalGroups: [
+              { name: "Ester", description: "Methyl ester of salicylic acid, giving it high volatility and distinctive minty odor." },
+              { name: "Phenolic hydroxyl", description: "Responsible for mild acidity and characteristic reactivity." }
+            ],
+            keyFact: "The chief component of wintergreen oil; it provides a heating/cooling counter-irritant effect in topical muscle rubs like Bengay or Tiger Balm.",
             pharmacologicalActivity: "Anti-inflammatory, analgesic, counter-irritant.",
             therapeuticActivity: "Used topically for muscle and joint pain.",
             structure2DPlaceholder: "https://picsum.photos/seed/methylsalicylate2d/300/200",

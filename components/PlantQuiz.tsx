@@ -97,6 +97,50 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
         correctAnswer: actOptions.indexOf(activity),
         explanation: en ? `Extracted compounds like ${targetCompound.name} possess this target therapeutic property.` : `Sebatian terekstrak seperti ${targetCompound.name} mempunyai sifat terapeutik sasaran ini.`
       });
+
+      // 4. Question about functional groups
+      if (targetCompound.functionalGroups && targetCompound.functionalGroups.length > 0) {
+        const targetGroup = targetCompound.functionalGroups[0];
+        const allOtherGroups = [
+          en ? "Amide linkage" : "Ikatan Amida",
+          en ? "Sulfate ester" : "Ester sulfat",
+          en ? "Primary amine" : "Amina primer",
+          en ? "Thiol group" : "Kumpulan Tiol"
+        ].filter(g => g !== targetGroup.name);
+        
+        const fgOptions = sorter([targetGroup.name, allOtherGroups[0], allOtherGroups[1], allOtherGroups[2]]);
+        
+        q.push({
+          id: 'q4',
+          type: 'multiple-choice',
+          question: en ? `Which functional group in ${targetCompound.name} is described as: "${targetGroup.description}"?` : `Manakah kumpulan berfungsi dalam ${targetCompound.name} yang diterangkan sebagai: "${targetGroup.description}"?`,
+          options: fgOptions,
+          correctAnswer: fgOptions.indexOf(targetGroup.name),
+          explanation: en ? `The ${targetGroup.name} plays a critical role in the molecule's chemical behavior.` : `${targetGroup.name} memainkan peranan penting dalam sifat kimia molekul.`
+        });
+      }
+
+      // 5. Question about key facts
+      if (targetCompound.keyFact) {
+        const fact = targetCompound.keyFact;
+        const fakeFacts = [
+          en ? "It is purely synthetic and never found in nature." : "Ia adalah sintetik sepenuhnya dan tidak pernah ditemui dalam alam semula jadi.",
+          en ? "It is a heavy metal complex." : "Ia merupakan kompleks logam berat.",
+          en ? "It functions primarily to dissolve plant roots." : "Fungsi utamanya adalah untuk melarutkan akar tumbuhan.",
+          en ? "It is highly volatile and boils at room temperature." : "Ia sangat meruap dan mendidih pada suhu bilik."
+        ];
+        
+        const factOptions = sorter([fact, fakeFacts[0], fakeFacts[1], fakeFacts[2]]);
+        
+        q.push({
+          id: 'q5',
+          type: 'multiple-choice',
+          question: en ? `Which of the following describes a key structural or historical fact about ${targetCompound.name}?` : `Manakah antara berikut menerangkan fakta struktur atau sejarah utama tentang ${targetCompound.name}?`,
+          options: factOptions,
+          correctAnswer: factOptions.indexOf(fact),
+          explanation: en ? `This is a unique characteristic of ${targetCompound.name}.` : `Ini adalah ciri unik bagi ${targetCompound.name}.`
+        });
+      }
     }
 
     return q;
