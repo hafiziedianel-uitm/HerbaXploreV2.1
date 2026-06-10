@@ -11,7 +11,9 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-  ReferenceArea
+  ReferenceArea,
+  AreaChart,
+  Area
 } from 'recharts';
 import Image from 'next/image';
 import { Wifi, AlertCircle, Database, ExternalLink, Network, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';

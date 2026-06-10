@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Leaf, 
@@ -174,9 +174,9 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
   const handlePrev = () => {
     setStartIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
   };
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setStartIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-  };
+  }, [maxIndex]);
 
   // Autoplay and Swipe/Drag States
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);

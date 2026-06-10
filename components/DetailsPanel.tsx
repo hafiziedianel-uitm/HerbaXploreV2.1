@@ -2,7 +2,7 @@
 
 import { Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle } from "lucide-react";
+import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle, ZoomIn, ZoomOut, RotateCcw, Crosshair } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { MassSpectrumChart, NMRSpectrumChart, NMRDataTable, CNMRSpectrumChart, CNMRDataTable } from "./SpectrumCharts";
@@ -17,6 +17,7 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
   const [showProtein, setShowProtein] = useState(true);
   const [showLigand, setShowLigand] = useState(true);
   const [showMisc, setShowMisc] = useState(true);
+  const [isSpinning, setIsSpinning] = useState(false);
 
   useEffect(() => {
     let viewer: any = null;
@@ -24,6 +25,7 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
     // Reset states on compound change
     setLoading(true);
     setError(false);
+    setIsSpinning(false);
     
     const initViewer = async () => {
       if (!viewerRef.current || !(window as any).$3Dmol) return;
@@ -117,8 +119,34 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
 
   }, [loading, error, showProtein, showLigand, showMisc, compound.pdbId]);
 
+  const handleZoomIn = () => viewerInstance.current?.zoom(1.2);
+  const handleZoomOut = () => viewerInstance.current?.zoom(0.8);
+  const handleRecenter = () => viewerInstance.current?.zoomTo();
+  const toggleSpin = () => {
+    const nextState = !isSpinning;
+    setIsSpinning(nextState);
+    if (viewerInstance.current) {
+      if (nextState) {
+        viewerInstance.current.spin("y", 1);
+      } else {
+        viewerInstance.current.spin(false);
+      }
+    }
+  };
+  const toggleFullscreen = () => {
+    const elem = viewerRef.current?.parentElement;
+    if (!elem) return;
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen().catch((err: any) => {
+        console.log(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   return (
-    <div className="flex-1 relative w-full h-full bg-stone-900 overflow-hidden">
+    <div className="flex-1 relative w-full h-full bg-stone-900 overflow-hidden group">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-stone-900/80 backdrop-blur-sm">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
@@ -133,7 +161,7 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
       <div ref={viewerRef} className="w-full h-full" style={{ position: 'relative' }} />
       
       {!isVRMode && !isMobile && (
-        <div className="absolute top-6 left-6 text-stone-400 text-xs flex flex-col gap-3 pointer-events-none z-10 bg-stone-900/50 p-4 rounded-xl border border-stone-800 backdrop-blur-md">
+        <div className="absolute top-6 left-6 text-stone-400 text-xs flex flex-col gap-3 pointer-events-none z-10 bg-stone-900/50 p-4 rounded-xl border border-stone-800 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-300 font-bold">L</div> 
             <span>Left Click + Drag to Rotate</span>
@@ -142,6 +170,49 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
             <div className="w-6 h-6 rounded bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-300 font-bold">↕</div> 
             <span>Scroll Wheel to Zoom</span>
           </div>
+        </div>
+      )}
+
+      {/* Floating Action Controls for 3D Viewer */}
+      {!loading && !error && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10 bg-stone-900/80 backdrop-blur-md p-2 rounded-2xl border border-stone-800 shadow-xl shadow-black/50">
+          <button 
+            onClick={toggleSpin}
+            className={`p-2.5 rounded-xl transition-all ${isSpinning ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-500/50' : 'text-stone-300 hover:bg-stone-800 border border-transparent'}`}
+            title="Auto Rotate"
+          >
+            <RotateCcw size={18} className={isSpinning ? "animate-spin-slow" : ""} />
+          </button>
+          <div className="w-px h-6 bg-stone-700 mx-1"></div>
+          <button 
+            onClick={handleZoomOut}
+            className="p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent"
+            title="Zoom Out"
+          >
+            <ZoomOut size={18} />
+          </button>
+          <button 
+            onClick={handleRecenter}
+            className="p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent"
+            title="Recenter"
+          >
+            <Crosshair size={18} />
+          </button>
+          <button 
+            onClick={handleZoomIn}
+            className="p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent"
+            title="Zoom In"
+          >
+            <ZoomIn size={18} />
+          </button>
+          <div className="w-px h-6 bg-stone-700 mx-1"></div>
+          <button 
+            onClick={toggleFullscreen}
+            className="p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent"
+            title="Fullscreen"
+          >
+            <Maximize2 size={18} />
+          </button>
         </div>
       )}
 
@@ -207,6 +278,8 @@ function Structure2DImage({ compound, onEnlarge }: { compound: Compound; onEnlar
     </div>
   );
 }
+
+import { PlantQuiz } from './PlantQuiz';
 
 function NpraSearchSection({ plant }: { plant: Plant }) {
   const [activeTab, setActiveTab] = useState<"1" | "2">("1"); // "1" = Pharmaceutical, "2" = Cosmetic
@@ -1205,6 +1278,11 @@ export function DetailsPanel({
               <div className="pt-2">
                 <NpraSearchSection plant={plant} />
               </div>
+              
+              {/* Interactive Quiz */}
+              <div className="pt-2 pb-4">
+                <PlantQuiz plant={plant} />
+              </div>
             </div>
 
             <div className="bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700/50 rounded-2xl p-6 transition-colors duration-300">
@@ -1402,9 +1480,6 @@ export function DetailsPanel({
                   >
                     <Headset size={18} />
                     {isVRMode ? 'VR Mode: ON' : 'VR Mode: OFF'}
-                  </button>
-                  <button className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-lg shadow-purple-900/20">
-                    Enter VR
                   </button>
                   <button 
                     onClick={() => setIs3DModalOpen(false)}

@@ -1116,7 +1116,7 @@ export const plantsData: Plant[] = [
     parts: [
       {
         id: "sumatra-resin",
-        name: "Benzoin Resin",
+        name: "Tree Resin",
         description: "Balsamic resin extracted from the bark of Styrax species.",
         coordinates: { x: 35, y: 35, width: 30, height: 30 },
         compounds: [
