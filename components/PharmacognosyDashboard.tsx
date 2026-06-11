@@ -172,6 +172,26 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
     setSelectedCompound(null);
   };
 
+  const handleNextPlant = () => {
+    const currentIndex = filteredPlants.findIndex(p => p.id === selectedPlant.id);
+    if (currentIndex !== -1 && filteredPlants.length > 0) {
+      const nextIndex = (currentIndex + 1) % filteredPlants.length;
+      setSelectedPlant(filteredPlants[nextIndex]);
+      setSelectedPart(null);
+      setSelectedCompound(null);
+    }
+  };
+
+  const handlePrevPlant = () => {
+    const currentIndex = filteredPlants.findIndex(p => p.id === selectedPlant.id);
+    if (currentIndex !== -1 && filteredPlants.length > 0) {
+      const prevIndex = (currentIndex - 1 + filteredPlants.length) % filteredPlants.length;
+      setSelectedPlant(filteredPlants[prevIndex]);
+      setSelectedPart(null);
+      setSelectedCompound(null);
+    }
+  };
+
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { language } = useLanguage();
@@ -554,6 +574,10 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
             onPartClick={handlePartClick} 
             onPartDoubleClick={handlePartDoubleClick}
             isMobile={isMobile}
+            onNextPlant={handleNextPlant}
+            onPrevPlant={handlePrevPlant}
+            currentPlantIndex={filteredPlants.findIndex(p => p.id === selectedPlant.id)}
+            totalPlantsCount={filteredPlants.length}
           />
         </div>
 
