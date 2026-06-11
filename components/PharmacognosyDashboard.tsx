@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
@@ -181,8 +181,71 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
+  // Mobile Swipe Gesture Recognition
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    
+    const target = e.target as HTMLElement;
+    // Do not trigger swipe on interactive elements like canvas, inputs, buttons
+    if (
+      target.tagName.toLowerCase() === 'canvas' ||
+      target.tagName.toLowerCase() === 'select' ||
+      target.tagName.toLowerCase() === 'input' ||
+      target.tagName.toLowerCase() === 'option' ||
+      target.closest('.no-swipe') ||
+      target.closest('#glmol') ||
+      target.closest('.interactive-3d') ||
+      target.closest('button') ||
+      target.closest('a')
+    ) {
+      return;
+    }
+
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isMobile || touchStartX.current === null || touchStartY.current === null) return;
+
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+
+    const diffX = endX - touchStartX.current;
+    const diffY = endY - touchStartY.current;
+
+    // Must be a horizontal swipe
+    if (Math.abs(diffX) > 60 && Math.abs(diffY) < 50) {
+      if (diffX > 0) {
+        // Swiped Right -> reveal left sidebar OR close right sidebar
+        if (!rightSidebarCollapsed) {
+          setRightSidebarCollapsed(true);
+        } else if (leftSidebarCollapsed) {
+          setLeftSidebarCollapsed(false);
+        }
+      } else {
+        // Swiped Left -> reveal right sidebar OR close left sidebar
+        if (!leftSidebarCollapsed) {
+          setLeftSidebarCollapsed(true);
+        } else if (rightSidebarCollapsed) {
+          setRightSidebarCollapsed(false);
+        }
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-stone-100 dark:bg-stone-950 transition-colors duration-300">
+    <div 
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="flex flex-col h-screen overflow-hidden bg-stone-100 dark:bg-stone-950 transition-colors duration-300"
+    >
       {/* Header */}
       <header className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between shrink-0 shadow-sm z-10 transition-colors duration-300">
         <div 

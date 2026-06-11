@@ -10,6 +10,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { translations, translateDb } from "@/lib/i18n";
 
 function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compound, isVRMode: boolean, isMobile?: boolean }) {
+  const { language } = useLanguage();
   const viewerRef = useRef<HTMLDivElement>(null);
   const viewerInstance = useRef<any>(null);
   const [loading, setLoading] = useState(true);
@@ -218,28 +219,34 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
 
       {/* Legend / Controls */}
       {!loading && !error && (
-        <div className="absolute top-6 right-6 flex flex-col gap-2 z-10">
+        <div className="absolute top-4 right-4 left-4 sm:left-auto flex flex-wrap gap-1.5 justify-end z-10 pointer-events-auto">
           {compound.pdbId && (
-            <label className={`flex items-center gap-3 bg-stone-900/80 backdrop-blur-md p-2.5 rounded-xl border ${showProtein ? 'border-stone-600 shadow-md shadow-black/50' : 'border-stone-800'} cursor-pointer transition-all duration-200 group`}>
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${showProtein ? 'bg-[#e7e5e4] border-[#e7e5e4]' : 'border-stone-600 bg-transparent'}`}></div>
+            <label className={`flex items-center gap-2 bg-stone-950/90 backdrop-blur-md py-1 px-2.5 rounded-lg border ${showProtein ? 'border-stone-700 shadow-md' : 'border-stone-900'} cursor-pointer transition-all duration-150 group`}>
+              <div className={`w-3 h-3 rounded-full border flex items-center justify-center transition-colors shrink-0 ${showProtein ? 'bg-[#e7e5e4] border-[#e7e5e4]' : 'border-stone-700 bg-transparent'}`}></div>
               <input type="checkbox" checked={showProtein} onChange={e => setShowProtein(e.target.checked)} className="hidden" />
-              <span className={`text-sm font-medium transition-colors ${showProtein ? 'text-stone-200' : 'text-stone-500 group-hover:text-stone-400'}`}>Protein Surface</span>
+              <span className={`text-[11px] font-medium transition-colors select-none ${showProtein ? 'text-stone-200' : 'text-stone-500 group-hover:text-stone-400'}`}>
+                {language === 'ms' ? 'Protein' : 'Protein'}
+              </span>
             </label>
           )}
-          <label className={`flex items-center gap-3 bg-stone-900/80 backdrop-blur-md p-2.5 rounded-xl border ${showLigand ? 'border-emerald-600/50 shadow-md shadow-emerald-900/20' : 'border-stone-800'} cursor-pointer transition-all duration-200 group`}>
-            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors text-[8px] font-bold ${showLigand ? 'bg-emerald-500 border-emerald-500 text-stone-900' : 'border-stone-600 bg-transparent text-transparent'}`}>
+          <label className={`flex items-center gap-2 bg-stone-950/90 backdrop-blur-md py-1 px-2.5 rounded-lg border ${showLigand ? 'border-emerald-700/50 shadow-md' : 'border-stone-900'} cursor-pointer transition-all duration-150 group`}>
+            <div className={`w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0 text-[7px] font-bold ${showLigand ? 'bg-emerald-500 border-emerald-500 text-stone-950' : 'border-stone-700 bg-transparent text-transparent'}`}>
               ◆
             </div>
             <input type="checkbox" checked={showLigand} onChange={e => setShowLigand(e.target.checked)} className="hidden" />
-            <span className={`text-sm font-medium transition-colors ${showLigand ? 'text-emerald-400' : 'text-stone-500 group-hover:text-stone-400'}`}>Ligand (Ball & Stick)</span>
+            <span className={`text-[11px] font-medium transition-colors select-none ${showLigand ? 'text-emerald-400' : 'text-stone-500 group-hover:text-stone-400'}`}>
+              {language === 'ms' ? 'Ligan' : 'Ligand'}
+            </span>
           </label>
           {compound.pdbId && (
-            <label className={`flex items-center gap-3 bg-stone-900/80 backdrop-blur-md p-2.5 rounded-xl border ${showMisc ? 'border-cyan-600/50 shadow-md shadow-cyan-900/20' : 'border-stone-800'} cursor-pointer transition-all duration-200 group`}>
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors text-[8px] font-bold ${showMisc ? 'bg-cyan-500 border-cyan-500 text-stone-900' : 'border-stone-600 bg-transparent text-transparent'}`}>
+            <label className={`flex items-center gap-2 bg-stone-950/90 backdrop-blur-md py-1 px-2.5 rounded-lg border ${showMisc ? 'border-cyan-700/50 shadow-md' : 'border-stone-900'} cursor-pointer transition-all duration-150 group`}>
+              <div className={`w-3 h-3 rounded-full border flex items-center justify-center transition-colors shrink-0 text-[7px] font-bold ${showMisc ? 'bg-cyan-500 border-cyan-500 text-stone-950' : 'border-stone-700 bg-transparent text-transparent'}`}>
                 ●
               </div>
               <input type="checkbox" checked={showMisc} onChange={e => setShowMisc(e.target.checked)} className="hidden" />
-              <span className={`text-sm font-medium transition-colors ${showMisc ? 'text-cyan-400' : 'text-stone-500 group-hover:text-stone-400'}`}>Miscellaneous (Water/Ions)</span>
+              <span className={`text-[11px] font-medium transition-colors select-none ${showMisc ? 'text-cyan-400' : 'text-stone-500 group-hover:text-stone-400'}`}>
+                {language === 'ms' ? 'Lain-lain' : 'Misc'}
+              </span>
             </label>
           )}
         </div>
@@ -896,15 +903,17 @@ export function DetailsPanel({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="p-6 pb-24"
+            className="px-6 pb-24 pt-0"
           >
-            <button 
-              onClick={onBackToPart}
-              className="flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-6 group"
-            >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              {t.backTo} {part.name}
-            </button>
+            <div className="sticky top-0 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md z-30 pt-6 pb-3 mb-6 border-b border-stone-100 dark:border-stone-800/60 -mx-6 px-6">
+              <button 
+                onClick={onBackToPart}
+                className="flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+              >
+                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                {t.backTo} {part.name}
+              </button>
+            </div>
 
             <div className="flex items-center gap-3 mb-4 sm:mb-6">
               <div className="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg sm:p-2.5 sm:rounded-xl text-emerald-700 dark:text-emerald-400">
@@ -1019,9 +1028,52 @@ export function DetailsPanel({
                       </button>
                     </div>
                   </div>
-                  <div className="bg-stone-900 dark:bg-stone-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center aspect-video text-center border border-stone-800 shadow-inner relative group transition-colors duration-300">
-                    <Interactive3DViewer compound={compound} isVRMode={false} isMobile={isMobile} />
-                  </div>
+                  <button
+                    onClick={() => setIs3DModalOpen(true)}
+                    className="w-full bg-stone-950 hover:bg-stone-900 rounded-2xl overflow-hidden flex flex-col items-center justify-center aspect-video text-center border border-stone-800 hover:border-emerald-500/50 shadow-inner relative group transition-all duration-300 select-none pb-4"
+                  >
+                    {/* Futuristic Grid and Glow */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.06)_0%,transparent_60%)] group-hover:bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.12)_0%,transparent_60%)] transition-colors duration-500 pointer-events-none" />
+                    
+                    {/* Abstract Molecule Nodes */}
+                    <div className="absolute inset-x-0 top-1/2 -translate-y-12 flex justify-center items-center pointer-events-none opacity-20 group-hover:opacity-30 transition-opacity">
+                      <div className="relative w-40 h-20">
+                        {/* Central Node */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                        
+                        {/* Branch 1 */}
+                        <div className="absolute top-4 left-6 w-3 h-3 rounded-full bg-emerald-400"></div>
+                        <div className="absolute top-1/2 left-[20%] w-px h-10 bg-gradient-to-tr from-emerald-500/50 to-emerald-400/50 origin-bottom-left rotate-[35deg]"></div>
+                        
+                        {/* Branch 2 */}
+                        <div className="absolute bottom-4 right-6 w-3.5 h-3.5 rounded-full bg-cyan-400"></div>
+                        <div className="absolute top-1/2 left-1/2 w-16 h-px bg-gradient-to-r from-emerald-500/50 to-cyan-400/50 origin-left rotate-[15deg]"></div>
+                        
+                        {/* Branch 3 */}
+                        <div className="absolute top-3 right-10 w-2 h-2 rounded-full bg-amber-400"></div>
+                        <div className="absolute top-1/2 left-1/2 w-14 h-px bg-gradient-to-r from-emerald-500/50 to-amber-400/50 origin-left -rotate-[45deg]"></div>
+                      </div>
+                    </div>
+
+                    {/* Central Button & Pulse */}
+                    <div className="relative z-10 flex flex-col items-center">
+                      <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-stone-900 border border-stone-800 group-hover:border-emerald-500/50 group-hover:bg-stone-800 transition-all duration-300 shadow-xl mb-4">
+                        {/* Pulse effect */}
+                        <div className="absolute inset-0 rounded-full bg-emerald-500/15 animate-ping opacity-75 group-hover:opacity-100" />
+                        <Dna size={24} className="text-emerald-500 animate-pulse" />
+                      </div>
+                      
+                      <div className="font-bold text-sm text-stone-200 group-hover:text-emerald-400 transition-colors uppercase tracking-wider mb-1 px-4">
+                        {language === 'ms' ? 'Ketik Untuk Skrin Penuh' : 'Click for Fullscreen'}
+                      </div>
+                      <div className="text-xs text-stone-500 group-hover:text-stone-400 transition-colors max-w-[250px] mx-auto px-4 leading-relaxed">
+                        {language === 'ms' 
+                          ? 'Klik untuk memuat dan berinteraksi dengan model protein & ligan.' 
+                          : 'Load and interact with 3D complex modeling structure.'}
+                      </div>
+                    </div>
+                  </button>
                 </section>
               )}
 
@@ -1193,15 +1245,17 @@ export function DetailsPanel({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="p-6 pb-24"
+            className="px-6 pb-24 pt-0"
           >
-            <button 
-              onClick={onBackToPlant}
-              className="flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-6 group"
-            >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              {t.backTo} {plant.name}
-            </button>
+            <div className="sticky top-0 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md z-30 pt-6 pb-3 mb-6 border-b border-stone-100 dark:border-stone-800/60 -mx-6 px-6">
+              <button 
+                onClick={onBackToPlant}
+                className="flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+              >
+                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                {t.backTo} {plant.name}
+              </button>
+            </div>
 
             <div className="mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100 mb-2 sm:mb-3">{part.name}</h2>
