@@ -175,13 +175,23 @@ export function PlantViewer({ plant, selectedPart, onPartClick, onPartDoubleClic
           </div>
         </div>
 
-      {/* Plant Title Overlay */}
-      <div className="absolute top-4 left-4 sm:top-8 sm:left-8 bg-white/90 dark:bg-stone-900/90 backdrop-blur-sm px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg border border-stone-200/50 dark:border-stone-800/50 transition-colors duration-300 z-20">
-        <h2 className="text-xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100">{plant.name}</h2>
-        <p className="text-xs sm:text-base text-stone-500 dark:text-stone-400 italic font-serif mb-1">{plant.scientificName}</p>
-        <p className="text-[10px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wide uppercase mt-2">
-          {language === 'ms' ? 'Ketik kawasan yang diserlahkan untuk melihat butiran' : 'Tap highlighted areas to view details'}
+      {/* Compact Plant Title Overlay */}
+      <div className="absolute top-4 left-4 sm:top-8 sm:left-8 bg-white/90 dark:bg-stone-900/90 backdrop-blur-sm px-3.5 py-2 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl shadow-md border border-stone-200/50 dark:border-stone-800/50 transition-colors duration-300 z-20 select-none max-w-[calc(100%-2rem)] sm:max-w-md">
+        <h2 className="text-sm sm:text-2xl md:text-3xl font-bold text-stone-800 dark:text-stone-100 tracking-tight leading-none">{plant.name}</h2>
+        <p className="text-[10px] sm:text-sm md:text-base text-stone-500 dark:text-stone-400 italic font-serif leading-none mt-1 sm:mt-1.5">{plant.scientificName}</p>
+        
+        {/* Only show double-click notice on larger screens to keep mobile overlay as minimal as possible */}
+        <p className="hidden sm:block text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide uppercase mt-2.5">
+          {language === 'ms' ? 'Dwi-klik bahagian untuk terus ke ligan 3D' : 'Double-click parts to view 3D ligand viewer'}
         </p>
+      </div>
+
+      {/* Floating Bottom Instruction Banner - beautifully aligned, readable, and non-blocking */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/95 dark:bg-stone-900/95 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-md border border-stone-200/60 dark:border-stone-800/60 z-20 pointer-events-none flex items-center gap-1.5 text-center transition-all duration-300 select-none">
+        <Leaf size={11} className="text-emerald-500 dark:text-emerald-400 animate-pulse shrink-0" />
+        <span className="text-[9px] sm:text-xs font-semibold tracking-wider text-stone-600 dark:text-stone-300 uppercase leading-none">
+          {language === 'ms' ? 'Ketik kawasan diserlahkan untuk butiran' : 'Tap highlighted areas for details'}
+        </span>
       </div>
     </div>
   );
