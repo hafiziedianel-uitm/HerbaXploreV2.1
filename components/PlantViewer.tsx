@@ -41,63 +41,8 @@ export function PlantViewer({
     setImageLoaded(false);
   }
 
-  // Swipe gesture tracking
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    // Prevent event from bubbling up to parents (which controls sidebars)
-    e.stopPropagation();
-
-    const target = e.target as HTMLElement;
-    if (
-      target.closest("button") || 
-      target.closest("a") || 
-      target.closest(".no-swipe")
-    ) {
-      return;
-    }
-
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.stopPropagation();
-
-    if (touchStartX.current === null || touchStartY.current === null) return;
-
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
-
-    const diffX = endX - touchStartX.current;
-    const diffY = endY - touchStartY.current;
-
-    // Detect horizontal swipe
-    if (Math.abs(diffX) > 40 && Math.abs(diffY) < 40) {
-      if (diffX > 0) {
-        // Swipe Right -> View PREVIOUS plant
-        if (onPrevPlant) {
-          setDirection(-1);
-          onPrevPlant();
-        }
-      } else {
-        // Swipe Left -> View NEXT plant
-        if (onNextPlant) {
-          setDirection(1);
-          onNextPlant();
-        }
-      }
-    }
-
-    touchStartX.current = null;
-    touchStartY.current = null;
-  };
-
   return (
     <div 
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
       className="flex-1 relative flex flex-col items-center justify-start p-4 sm:p-8 overflow-y-auto custom-scrollbar select-none w-full"
     >
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)]" />
@@ -336,8 +281,8 @@ export function PlantViewer({
                 <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold shrink-0 mt-0.5 border border-emerald-500/10">1</div>
                 <p className="leading-relaxed">
                   {language === 'ms' 
-                    ? 'Dwi-ketik atau sapu pada tumbuhan untuk menukar spesies.' 
-                    : 'Tap hotspots or swipe on page to navigate other plants.'}
+                    ? 'Sapu kanan untuk melihat Senarai Tumbuhan, sapu kiri untuk melihat Butiran Kimia.' 
+                    : 'Swipe right to view Plant Database, or swipe left to view Chemical details.'}
                 </p>
               </li>
               <li className="flex items-start gap-2.5">
@@ -366,7 +311,7 @@ export function PlantViewer({
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-emerald-500/30 z-35 pointer-events-none flex items-center gap-1.5 text-center transition-all duration-300 select-none animate-bounce">
           <Leaf size={12} className="text-white shrink-0 animate-pulse" />
           <span className="text-[10px] font-extrabold tracking-wider uppercase leading-none">
-            {language === 'ms' ? 'Sapu kiri/kanan untuk spesies lain' : 'Swipe left/right to browse plants'}
+            {language === 'ms' ? 'Sapu kanan untuk senarai tumbuhan • Sapu kiri untuk butiran' : 'Swipe right for plant database • Swipe left for details'}
           </span>
         </div>
       )}
