@@ -2,8 +2,11 @@ import { Language } from "./LanguageContext";
 import { dbTranslations } from "./dbTranslations";
 
 export function translateDb(text: string, language: Language): string {
-  if (language === 'en') return text;
-  return dbTranslations[language]?.[text] || text;
+  const dict = dbTranslations[language];
+  if (dict && dict[text]) {
+    return dict[text];
+  }
+  return text;
 }
 
 export const translations = {

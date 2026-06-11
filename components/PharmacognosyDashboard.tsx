@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
 import { DetailsPanel } from "./DetailsPanel";
-import { Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, SlidersHorizontal, Filter, RotateCcw, Home } from "lucide-react";
+import { Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, SlidersHorizontal, Filter, RotateCcw, Home, Languages } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -67,6 +67,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
       let matchesText = false;
       
       if (p.name.toLowerCase().includes(query)) matchesText = true;
+      if (translateDb(p.name, language).toLowerCase().includes(query)) matchesText = true;
       if (p.scientificName?.toLowerCase().includes(query)) matchesText = true;
       
       for (const part of p.parts) {
@@ -194,7 +195,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
 
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const t = translations[language];
 
   useEffect(() => {
@@ -290,7 +291,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                 onClick={handleBackToPlant}
                 className={`hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors ${!selectedPart ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : ''}`}
               >
-                {selectedPlant.name}
+                {translateDb(selectedPlant.name, language)}
               </button>
               
               {selectedPart && (
@@ -334,6 +335,16 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
             >
               <Menu size={18} />
               <span className="text-sm font-bold">{t.plantsParams}</span>
+            </button>
+
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'ms' : 'en')}
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-xs font-bold border border-stone-200/20 dark:border-stone-700/30"
+              title="Change Language / Tukar Bahasa"
+            >
+              <Languages size={15} />
+              <span>{language === 'en' ? 'English' : 'B. Melayu'}</span>
             </button>
 
             {/* Theme Toggle */}
@@ -529,7 +540,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                         <div className="flex items-center gap-3">
                           <div className={`w-2 h-2 rounded-full transition-colors shrink-0 ${selectedPlant.id === p.id ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-stone-300 dark:bg-stone-600'}`} />
                           <span className="leading-snug text-xs sm:text-sm font-semibold truncate flex-1">
-                            {p.name}
+                            {translateDb(p.name, language)}
                           </span>
                         </div>
                         <div className="pl-5 flex items-center justify-between text-[10px] text-stone-400 dark:text-stone-500 font-mono italic">
@@ -609,9 +620,19 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
           <div className={`w-full bg-white dark:bg-stone-900 border-l border-stone-200 dark:border-stone-800 shadow-xl flex flex-col h-full overflow-hidden transition-colors duration-300 ${rightSidebarCollapsed ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100'}`}>
             <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between shrink-0">
               <h2 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">{t.details}</h2>
-              <button onClick={() => setRightSidebarCollapsed(true)} className="text-stone-400 hover:text-stone-600">
-                <CloseIcon size={18} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setLanguage(language === 'en' ? 'ms' : 'en')}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-xs font-semibold border border-stone-200/20 dark:border-stone-700/30"
+                  title="Change Language / Tukar Bahasa"
+                >
+                  <Languages size={13} />
+                  <span>{language === 'en' ? 'EN' : 'BM'}</span>
+                </button>
+                <button onClick={() => setRightSidebarCollapsed(true)} className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors">
+                  <CloseIcon size={18} />
+                </button>
+              </div>
             </div>
             <div className="flex-1 flex flex-col overflow-hidden">
               <DetailsPanel 

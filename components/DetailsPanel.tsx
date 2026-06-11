@@ -1253,7 +1253,7 @@ export function DetailsPanel({
                 className="flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
               >
                 <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                {t.backTo} {plant.name}
+                {t.backTo} {translateDb(plant.name, language)}
               </button>
             </div>
 
@@ -1324,7 +1324,7 @@ export function DetailsPanel({
               <div className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 transition-colors duration-300">
                 <Info size={24} className="sm:w-8 sm:h-8" />
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100 mb-1 sm:mb-2">{plant.name}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100 mb-1 sm:mb-2">{translateDb(plant.name, language)}</h2>
               <p className="text-emerald-700 dark:text-emerald-400 italic font-serif text-base sm:text-lg mb-3">{plant.scientificName}</p>
               
               {plant.synonyms && plant.synonyms.length > 0 && (

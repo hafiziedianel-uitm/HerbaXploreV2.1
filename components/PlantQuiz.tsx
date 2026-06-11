@@ -52,7 +52,7 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
       q.push({
         id: 'q1',
         type: 'multiple-choice',
-        question: en ? `Which part of ${plant.name} is predominantly used in traditional medicine or extraction?` : `Bahagian manakah pada ${plant.name} yang paling banyak digunakan dalam perubatan tradisional atau pengekstrakan?`,
+        question: en ? `Which part of ${translateDb(plant.name, language)} is predominantly used in traditional medicine or extraction?` : `Bahagian manakah pada ${translateDb(plant.name, language)} yang paling banyak digunakan dalam perubatan tradisional atau pengekstrakan?`,
         options: options,
         correctAnswer: options.indexOf(partNames[0]),
         explanation: en ? `The ${partNames[0]} is a primary source of therapeutic compounds.` : `${partNames[0]} adalah sumber utama sebatian terapeutik.`
@@ -72,7 +72,7 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
       q.push({
         id: 'q2',
         type: 'multiple-choice',
-        question: en ? `Which of the following bioactive compounds is a major constituent of ${plant.name}?` : `Antara sebatian bioaktif berikut, manakah merupakan juzuk utama ${plant.name}?`,
+        question: en ? `Which of the following bioactive compounds is a major constituent of ${translateDb(plant.name, language)}?` : `Antara sebatian bioaktif berikut, manakah merupakan juzuk utama ${translateDb(plant.name, language)}?`,
         options,
         correctAnswer: options.indexOf(targetCompound.name),
         explanation: en ? `${targetCompound.name} contributes significantly to its pharmacological profile.` : `${targetCompound.name} menyumbang secara ketara kepada profil farmakologinya.`

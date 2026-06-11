@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef } from "react";
 import { Leaf, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
-import { translations } from "@/lib/i18n";
+import { translations, translateDb } from "@/lib/i18n";
 
 interface PlantViewerProps {
   plant: Plant;
@@ -65,7 +65,7 @@ export function PlantViewer({
           >
             <img
               src={plant.imageUrl}
-              alt={plant.name}
+              alt={translateDb(plant.name, language)}
               onLoad={() => setImageLoaded(true)}
               className={`block w-auto h-auto max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[calc(100vh-270px)] object-contain transition-all duration-500 ease-out select-none ${
                 imageLoaded ? "opacity-90 hover:opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-md"
@@ -191,7 +191,7 @@ export function PlantViewer({
 
         {/* Plant Title Overlay */}
         <div className="w-full max-w-xl text-center mb-4 select-none px-4">
-          <h2 className="text-xl sm:text-3xl font-extrabold text-stone-800 dark:text-stone-100 tracking-tight leading-none">{plant.name}</h2>
+          <h2 className="text-xl sm:text-3xl font-extrabold text-stone-800 dark:text-stone-100 tracking-tight leading-none">{translateDb(plant.name, language)}</h2>
           <p className="text-xs sm:text-base text-stone-500 dark:text-stone-400 italic font-serif mt-2 leading-tight">{plant.scientificName}</p>
         </div>
 
