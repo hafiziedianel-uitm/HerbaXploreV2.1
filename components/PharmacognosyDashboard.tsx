@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
 import { DetailsPanel } from "./DetailsPanel";
@@ -413,36 +414,49 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                   </button>
                 </div>
               ) : (
-                filteredPlants.map(p => {
-                  const totalCompoundsInPlant = p.parts.reduce((acc, part) => acc + part.compounds.length, 0);
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        setSelectedPlant(p);
-                        setSelectedPart(null);
-                        setSelectedCompound(null);
-                        if (isMobile) setLeftSidebarCollapsed(true);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 rounded-xl transition-all flex flex-col gap-1 ${
-                        selectedPlant.id === p.id 
-                          ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium shadow-sm border border-emerald-100 dark:border-emerald-800/50' 
-                          : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 border border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full transition-colors shrink-0 ${selectedPlant.id === p.id ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-stone-300 dark:bg-stone-600'}`} />
-                        <span className="leading-snug text-xs sm:text-sm font-semibold truncate flex-1">
-                          {p.name}
-                        </span>
-                      </div>
-                      <div className="pl-5 flex items-center justify-between text-[10px] text-stone-400 dark:text-stone-500 font-mono italic">
-                        <span className="truncate max-w-[140px]">{p.scientificName}</span>
-                        <span className="font-normal opacity-80 shrink-0">{totalCompoundsInPlant} {t.cmpds}</span>
-                      </div>
-                    </button>
-                  );
-                })
+                <AnimatePresence mode="popLayout">
+                  {filteredPlants.map((p, idx) => {
+                    const totalCompoundsInPlant = p.parts.reduce((acc, part) => acc + part.compounds.length, 0);
+                    return (
+                      <motion.button
+                        key={p.id}
+                        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ 
+                          duration: 0.25, 
+                          delay: Math.min(idx * 0.03, 0.3),
+                          ease: "easeOut"
+                        }}
+                        whileHover={{ scale: 1.015, x: 2 }}
+                        whileTap={{ scale: 0.985 }}
+                        layout="position"
+                        onClick={() => {
+                          setSelectedPlant(p);
+                          setSelectedPart(null);
+                          setSelectedCompound(null);
+                          if (isMobile) setLeftSidebarCollapsed(true);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl transition-all flex flex-col gap-1 ${
+                          selectedPlant.id === p.id 
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-medium shadow-sm border border-emerald-100 dark:border-emerald-800/50' 
+                            : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full transition-colors shrink-0 ${selectedPlant.id === p.id ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-stone-300 dark:bg-stone-600'}`} />
+                          <span className="leading-snug text-xs sm:text-sm font-semibold truncate flex-1">
+                            {p.name}
+                          </span>
+                        </div>
+                        <div className="pl-5 flex items-center justify-between text-[10px] text-stone-400 dark:text-stone-500 font-mono italic">
+                          <span className="truncate max-w-[140px]">{p.scientificName}</span>
+                          <span className="font-normal opacity-80 shrink-0">{totalCompoundsInPlant} {t.cmpds}</span>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </AnimatePresence>
               )}
             </div>
           </div>

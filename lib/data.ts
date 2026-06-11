@@ -685,7 +685,7 @@ export const plantsData: Plant[] = [
     scientificName: "Sterculia urens",
     description: "Obtained as a dried gummy exudate from the bark and stem of Sterculia urens. Contains acidic polysaccharides mainly composed of galactose, rhamnose, and galacturonic acid.",
     synonyms: ["Karaya Gum Tree", "Indian Tragacanth", "Katira"],
-    imageUrl: "/ghost_tree.jpg",
+    imageUrl: "/sterculia.jpg",
     marketAvailability: "Bulk laxative products, denture adhesives.",
     parts: [
       {
@@ -1205,7 +1205,7 @@ export const plantsData: Plant[] = [
         id: "balsam-resin",
         name: "Resin",
         description: "Balsamic exudate collected from the bark and trunk of Myroxylon balsamum.",
-        coordinates: { x: 35, y: 35, width: 30, height: 30 },
+        coordinates: { x: 48, y: 15, width: 22, height: 53 },
         compounds: [
           {
             id: "benzyl-benzoate",
