@@ -357,12 +357,6 @@ export const plantsData: Plant[] = [
             therapeuticActivity: "Used for digestive disorders and as an antimicrobial agent.",
             structure2DPlaceholder: "https://picsum.photos/seed/cinnamaldehyde2d/300/200",
             structure3DPlaceholder: "Interactive 3D view for Cinnamaldehyde",
-            functionalGroups: [
-              { name: "Aldehyde group", description: "The highly reactive carbonyl carbon can form Schiff bases with proteins, accounting for its antimicrobial action." },
-              { name: "Conjugated double bond", description: "Connects the phenyl ring to the aldehyde, giving the molecule stability and its yellowish color." },
-              { name: "Aromatic ring", description: "Enhances the lipophilicity, allowing the compound to penetrate bacterial cell membranes." }
-            ],
-            keyFact: "Its distinctive flavor and scent come from the combination of the aromatic ring conjugated directly with the aldehyde group, making it an essential spice in culinary traditions worldwide.",
             pharmaceuticalAnalysis: {
               molecularWeight: "132.16 g/mol",
               nominalMass: "132 Da",

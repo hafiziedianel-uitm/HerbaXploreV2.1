@@ -113,6 +113,14 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
       imagePath: "/hafizie-dianel.png"
     },
     {
+      name: "En. Fairos Hamid",
+      role: "Faculty KIK Coordinator & Supervisor",
+      title: "Penyelaras KIK Fakulti",
+      department: "Faculty of Pharmacy, UiTM",
+      email: "fairos@uitm.edu.my",
+      imagePath: "/fairos.png"
+    },
+    {
       name: "Dr. Abu Sadat Md Sayem",
       role: "Secretary & Pharmacology Expert",
       title: "Pensyarah Kanan",

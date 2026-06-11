@@ -1033,7 +1033,7 @@ export function DetailsPanel({
                     {language === 'ms' ? 'Fakta Penting' : 'Key Structural Fact'}
                   </h3>
                   <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800/50 p-5 transition-colors duration-300">
-                    <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-medium italic">"{translateDb(compound.keyFact, language)}"</p>
+                    <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-medium italic">&ldquo;{translateDb(compound.keyFact, language)}&rdquo;</p>
                   </div>
                 </section>
               )}

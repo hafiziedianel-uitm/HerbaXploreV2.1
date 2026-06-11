@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Plant, PlantPart } from '@/lib/data';
+import { Plant, PlantPart, getCompoundBioactiveClass } from '@/lib/data';
 import { useLanguage } from '@/lib/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, XCircle, Award, RefreshCcw, ArrowRight, HelpCircle } from 'lucide-react';
@@ -140,6 +140,62 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
           correctAnswer: factOptions.indexOf(fact),
           explanation: en ? `This is a unique characteristic of ${targetCompound.name}.` : `Ini adalah ciri unik bagi ${targetCompound.name}.`
         });
+      }
+
+      // 6. Question about chemical classification
+      const classes = getCompoundBioactiveClass(targetCompound);
+      if (classes.length > 0) {
+        const primaryClass = classes[0];
+        const allPossibleClasses = ["Flavonoid", "Alkaloid", "Fatty Acid", "Polysaccharide / Gum", "Glycoside", "Phenylpropene / Aldehyde", "Phenolic derivative / Organic Acid"];
+        const fakeClasses = allPossibleClasses.filter(c => c !== primaryClass);
+        const classificationOptions = sorter([primaryClass, fakeClasses[0], fakeClasses[1], fakeClasses[2]]);
+        
+        q.push({
+          id: 'q6',
+          type: 'multiple-choice',
+          question: en ? `Which chemical class does ${targetCompound.name} primarily belong to?` : `Golongan kimia manakah yang paling tepat untuk ${targetCompound.name}?`,
+          options: classificationOptions,
+          correctAnswer: classificationOptions.indexOf(primaryClass),
+          explanation: en ? `${targetCompound.name} is classified as a ${primaryClass} based on its structure.` : `${targetCompound.name} diklasifikasikan sebagai ${primaryClass} berdasarkan strukturnya.`
+        });
+
+        // 7. Question about characterisation tests based on lecture notes
+        let testQuestion: Question | null = null;
+        if (classes.includes("Flavonoid")) {
+          const options = sorter([
+            en ? "Cyanidin reaction (produces red/orange/purple color)" : "Tindak balas sianidin (menghasilkan warna merah/oren/ungu)",
+            en ? "Bornträger reaction (produces red color in alkaline medium)" : "Tindak balas Bornträger (menghasilkan warna merah dalam medium alkali)",
+            en ? "Bate-Smith reaction (produces red color upon hydrolysis)" : "Tindak balas Bate-Smith (menghasilkan warna merah apabila dihidrolisis)",
+            en ? "Alkaloidal precipitation test (Mayer's reagent)" : "Ujian pemendakan alkaloid (reagen Mayer)"
+          ]);
+          testQuestion = {
+            id: 'q7',
+            type: 'multiple-choice',
+            question: en ? `According to lecture notes, which specific test is used to characterise flavonoids like ${targetCompound.name}?` : `Menurut nota kuliah, ujian manakah yang khusus digunakan untuk mencirian flavonoid seperti ${targetCompound.name}?`,
+            options,
+            correctAnswer: options.indexOf(en ? "Cyanidin reaction (produces red/orange/purple color)" : "Tindak balas sianidin (menghasilkan warna merah/oren/ungu)"),
+            explanation: en ? `The "cyanidin reaction" is a specific coloured reaction for flavonoids stricto sensu, yielding flavylium ions.` : `Tindak balas "sianidin" adalah khusus untuk flavonoid, menghasilkan ion flavilium berwarna.`
+          };
+        } else if (classes.includes("Phenolic derivative / Organic Acid")) {
+          const options = sorter([
+            en ? "Ferric chloride (FeCl3) test (yields dark blue/green color)" : "Ujian ferik klorida (FeCl3) (menghasilkan warna biru/hijau gelap)",
+            en ? "Dragendorff's Test (yields orange precipitate)" : "Ujian Dragendorff (menghasilkan mendakan oren)",
+            en ? "Bornträger reaction" : "Tindak balas Bornträger",
+            en ? "Froth test" : "Ujian buih"
+          ]);
+          testQuestion = {
+            id: 'q7',
+            type: 'multiple-choice',
+            question: en ? `Which general qualitative test is most appropriate for a phenolic compound like ${targetCompound.name}?` : `Ujian kualitatif umum manakah yang paling sesuai untuk sebatian fenolik seperti ${targetCompound.name}?`,
+            options,
+            correctAnswer: options.indexOf(en ? "Ferric chloride (FeCl3) test (yields dark blue/green color)" : "Ujian ferik klorida (FeCl3) (menghasilkan warna biru/hijau gelap)"),
+            explanation: en ? `Phenolics can be detected through colored reactions with ferric chloride (FeCl3).` : `Sebatian fenolik boleh dikesan melalui tindak balas warna dengan ferik klorida (FeCl3).`
+          };
+        }
+        
+        if (testQuestion) {
+          q.push(testQuestion);
+        }
       }
     }
 
