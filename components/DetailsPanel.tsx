@@ -1369,25 +1369,7 @@ export function DetailsPanel({
               </div>
             </div>
 
-            <div className="bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700/50 rounded-2xl p-6 transition-colors duration-300">
-              <h3 className="font-bold text-stone-800 dark:text-stone-100 mb-2">
-                {language === 'ms' ? 'Cara menggunakan peneroka ini:' : 'How to use this explorer:'}
-              </h3>
-              <ul className="space-y-3 text-stone-600 dark:text-stone-400">
-                <li className="flex items-start gap-3">
-                  <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
-                  <p>{language === 'ms' ? 'Tuding pada imej tumbuhan di sebelah kiri untuk melihat kawasan interaktif.' : 'Hover over the plant image on the left to see interactive regions.'}</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
-                  <p>{language === 'ms' ? 'Klik pada bahagian tertentu (cth. Daun, Bunga) untuk melihat sebatian yang diekstrak.' : 'Click on a specific part (e.g., Leaves, Flowers) to view its extracted compounds.'}</p>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</div>
-                  <p>{language === 'ms' ? 'Pilih sebatian untuk mendedahkan struktur 2D/3D serta sifat farmakologinya.' : 'Select a compound to reveal its 2D/3D structure and pharmacological properties.'}</p>
-                </li>
-              </ul>
-            </div>
+
           </motion.div>
         )}
       </AnimatePresence>

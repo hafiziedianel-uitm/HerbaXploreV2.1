@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
 import { DetailsPanel } from "./DetailsPanel";
+import { GeminiChatbox } from "./GeminiChatbox";
 import { Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, SlidersHorizontal, Filter, RotateCcw, Home } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -603,6 +604,9 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
           </div>
         </div>
       </div>
+      
+      {/* Floating Gemini Chatbot with custom Gem context */}
+      <GeminiChatbox selectedPlant={selectedPlant} selectedCompound={selectedCompound} />
     </div>
   );
 }
