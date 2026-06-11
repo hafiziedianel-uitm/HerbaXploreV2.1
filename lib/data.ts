@@ -906,7 +906,7 @@ export const plantsData: Plant[] = [
   },
   {
     id: "flaxseed",
-    name: "Flexseed",
+    name: "Flaxseed",
     scientificName: "Linum usitatissimum (Flaxseed)",
     synonyms: ["Flax", "Flaxseed", "Linseed"],
     description: "Source of α-Linolenic acid, linoleic acid, oleic acid, palmitic acid, stearic acid.",
