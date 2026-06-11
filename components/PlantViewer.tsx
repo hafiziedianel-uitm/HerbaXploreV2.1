@@ -3,7 +3,8 @@
 import { Plant, PlantPart } from "@/lib/data";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Leaf } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { translations } from "@/lib/i18n";
 
@@ -17,21 +18,76 @@ interface PlantViewerProps {
 
 export function PlantViewer({ plant, selectedPart, onPartClick, onPartDoubleClick, isMobile }: PlantViewerProps) {
   const [hoveredPart, setHoveredPart] = useState<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const { language } = useLanguage();
   const t = translations[language];
+
+  const [prevImageUrl, setPrevImageUrl] = useState(plant.imageUrl);
+  if (plant.imageUrl !== prevImageUrl) {
+    setPrevImageUrl(plant.imageUrl);
+    setImageLoaded(false);
+  }
 
   return (
     <div className="flex-1 relative flex items-start justify-center md:items-center p-4 sm:p-8 overflow-y-auto custom-scrollbar">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)]" />
       
-      {/* Using a flex container to center the perfectly-wrapped image */}
-      <div className="w-full h-full flex justify-center items-center">
-        <div className="relative inline-block max-w-full rounded-[2rem] shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden text-left bg-white dark:bg-stone-900 transition-colors duration-300">
-          <img
-            src={plant.imageUrl}
-            alt={plant.name}
-            className="block w-auto h-auto max-w-full max-h-[70vh] sm:max-h-[80vh] md:max-h-[calc(100vh-160px)] object-contain opacity-90 hover:opacity-100 transition-opacity duration-700"
-          />
+      {/* Container wraps the image perfectly so hotspot percentages are aligned, preventing layout crops */}
+      <div 
+        style={{
+          minHeight: !imageLoaded ? "300px" : "auto",
+          minWidth: !imageLoaded ? "280px" : "auto",
+          maxWidth: "100%",
+        }}
+        className={
+          imageLoaded 
+            ? "relative inline-block max-w-full rounded-[2rem] shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden text-left bg-stone-50 dark:bg-stone-950 transition-all duration-300"
+            : "relative rounded-[2rem] shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden text-left bg-stone-50 dark:bg-stone-950 transition-all duration-300 flex items-center justify-center p-8"
+        }
+      >
+        <img
+          src={plant.imageUrl}
+          alt={plant.name}
+          onLoad={() => setImageLoaded(true)}
+          className={`block w-auto h-auto max-w-full max-h-[65vh] sm:max-h-[75vh] md:max-h-[calc(100vh-180px)] object-contain transition-all duration-500 ease-out select-none ${
+            imageLoaded ? "opacity-90 hover:opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-md"
+          }`}
+        />
+          
+          <AnimatePresence>
+            {!imageLoaded && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 flex flex-col items-center justify-center bg-stone-50/70 dark:bg-stone-950/70 backdrop-blur-[2px] z-20 pointer-events-none"
+              >
+                <motion.div
+                  animate={{ 
+                    rotate: 360,
+                    scale: [1, 1.12, 1]
+                  }}
+                  transition={{ 
+                    rotate: { repeat: Infinity, duration: 2.2, ease: "linear" },
+                    scale: { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+                  }}
+                  className="text-emerald-500/60 dark:text-emerald-400/60"
+                  style={{ opacity: 0.4 }} // 60% transparency = 40% opacity
+                >
+                  <Leaf size={48} />
+                </motion.div>
+                <motion.p 
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="mt-3 text-xs font-mono font-medium text-stone-500/80 dark:text-stone-400/80 tracking-wide text-center"
+                >
+                  {language === "ms" ? "Memuatkan Imej..." : "Loading Image..."}
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           <div className="absolute inset-0 group-wrapper">
             {/* Overlay to dim unselected parts when a part is selected */}
@@ -118,7 +174,6 @@ export function PlantViewer({ plant, selectedPart, onPartClick, onPartDoubleClic
             })}
           </div>
         </div>
-      </div>
 
       {/* Plant Title Overlay */}
       <div className="absolute top-4 left-4 sm:top-8 sm:left-8 bg-white/90 dark:bg-stone-900/90 backdrop-blur-sm px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg border border-stone-200/50 dark:border-stone-800/50 transition-colors duration-300 z-20">
