@@ -47,6 +47,11 @@ interface PharmacognosyDashboardProps {
 
 export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardProps) {
   const isMobile = useIsMobile();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { language, setLanguage } = useLanguage();
+  const t = translations[language];
+
   const [selectedPlant, setSelectedPlant] = useState<Plant>(plantsData[0]);
   const [selectedPart, setSelectedPart] = useState<PlantPart | null>(null);
   const [selectedCompound, setSelectedCompound] = useState<Compound | null>(null);
@@ -192,11 +197,6 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
       setSelectedCompound(null);
     }
   };
-
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const { language, setLanguage } = useLanguage();
-  const t = translations[language];
 
   useEffect(() => {
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect

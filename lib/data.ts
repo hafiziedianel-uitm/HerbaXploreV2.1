@@ -705,7 +705,7 @@ export const plantsData: Plant[] = [
             hide3D: true,
             pharmacologicalActivity: "Bulk laxative, tablet binder, thickener.",
             therapeuticActivity: "Used as a bulk-forming laxative.",
-            structure2DPlaceholder: "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/galacturonic%20acid/PNG",
+            structure2DPlaceholder: "/sterculia-polysaccharide-2d.svg",
             structure3DPlaceholder: "Interactive 3D view",
             pharmaceuticalAnalysis: {
               molecularWeight: "High",

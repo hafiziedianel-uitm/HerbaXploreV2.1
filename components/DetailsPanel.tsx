@@ -11,64 +11,130 @@ import { translations, translateDb } from "@/lib/i18n";
 
 function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compound, isVRMode: boolean, isMobile?: boolean }) {
   const { language } = useLanguage();
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const viewerInstance = useRef<any>(null);
+  const viewerRefSingle = useRef<HTMLDivElement>(null);
+  const viewerRefLeft = useRef<HTMLDivElement>(null);
+  const viewerRefRight = useRef<HTMLDivElement>(null);
+  
+  const viewerInstanceSingle = useRef<any>(null);
+  const viewerInstanceLeft = useRef<any>(null);
+  const viewerInstanceRight = useRef<any>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showProtein, setShowProtein] = useState(true);
   const [showLigand, setShowLigand] = useState(true);
   const [showMisc, setShowMisc] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
+  const lastSyncView = useRef<string>("");
 
   useEffect(() => {
-    let viewer: any = null;
-    
-    // Reset states on compound change
+    // Reset states on compound change or VR mode change
     setLoading(true);
     setError(false);
     setIsSpinning(false);
     
+    let active = true;
+    
     const initViewer = async () => {
-      if (!viewerRef.current || !(window as any).$3Dmol) return;
+      if (!(window as any).$3Dmol) return;
       
       try {
-        // Clear previous
-        viewerRef.current.innerHTML = '';
+        let pdbData = "";
+        let sdfData = "";
+        const isPdb = !!compound.pdbId;
         
-        viewer = (window as any).$3Dmol.createViewer(viewerRef.current, {
-          backgroundColor: isVRMode ? 'black' : '#1c1917', // stone-900
-        });
-        viewerInstance.current = viewer;
-        
-        // Load PDB or SDF
-        if (compound.pdbId) {
+        // Fetch model data once
+        if (isPdb) {
           const response = await fetch(`https://files.rcsb.org/download/${compound.pdbId}.pdb`);
           if (!response.ok) {
             throw new Error('Failed to fetch PDB structure');
           }
-          const pdbData = await response.text();
-          viewer.addModel(pdbData, "pdb");
-          viewer.zoomTo();
+          pdbData = await response.text();
         } else {
-          // Fetch SDF from PubChem
           const response = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=3d`);
           if (!response.ok) {
             throw new Error('Failed to fetch 3D structure');
           }
-          const sdfData = await response.text();
-          viewer.addModel(sdfData, "sdf");
-          viewer.zoomTo();
+          sdfData = await response.text();
         }
-        
-        setLoading(false);
+
+        if (!active) return;
+
+        const setupAViewer = (ref: HTMLDivElement | null, modelData: string, isPdbFormat: boolean) => {
+          if (!ref) return null;
+          ref.innerHTML = '';
+          const viewer = (window as any).$3Dmol.createViewer(ref, {
+            backgroundColor: isVRMode ? 'black' : '#1c1917', // stone-900 or black
+          });
+          viewer.addModel(modelData, isPdbFormat ? "pdb" : "sdf");
+          viewer.zoomTo();
+          return viewer;
+        };
+
+        if (isVRMode) {
+          // Give DOM elements a render tick to be populated in VRMode
+          setTimeout(() => {
+            if (!active) return;
+            if (viewerRefLeft.current && viewerRefRight.current) {
+              viewerInstanceLeft.current = setupAViewer(viewerRefLeft.current, isPdb ? pdbData : sdfData, isPdb);
+              viewerInstanceRight.current = setupAViewer(viewerRefRight.current, isPdb ? pdbData : sdfData, isPdb);
+              
+              // Trigger styles and rendering immediately
+              applyViewerStyles([viewerInstanceLeft.current, viewerInstanceRight.current]);
+            }
+            setLoading(false);
+          }, 50);
+        } else {
+          setTimeout(() => {
+            if (!active) return;
+            if (viewerRefSingle.current) {
+              viewerInstanceSingle.current = setupAViewer(viewerRefSingle.current, isPdb ? pdbData : sdfData, isPdb);
+              applyViewerStyles([viewerInstanceSingle.current]);
+            }
+            setLoading(false);
+          }, 50);
+        }
       } catch (err) {
         console.error("Error loading 3D model:", err);
-        setError(true);
-        setLoading(false);
+        if (active) {
+          setError(true);
+          setLoading(false);
+        }
       }
     };
 
-    // Give the script a moment to load if it hasn't
+    const applyViewerStyles = (viewers: any[]) => {
+      const activeViewers = viewers.filter(Boolean);
+      if (activeViewers.length === 0 || !(window as any).$3Dmol) return;
+
+      const miscResn = ['HOH', 'WAT', 'NH3', 'NA', 'CL', 'MG', 'ZN', 'CA', 'K', 'SO4', 'PO4', 'NAG', 'MAN', 'EDO', 'FMT', 'GOL', 'DMS', 'ACT', 'PEG', 'PGE', 'SO3', 'NO3', 'IOD', 'BR', 'F'];
+
+      activeViewers.forEach((viewer: any) => {
+        viewer.removeAllSurfaces();
+        viewer.setStyle({}, { hidden: true });
+
+        if (compound.pdbId) {
+          if (showProtein) {
+            viewer.addSurface((window as any).$3Dmol.SurfaceType.VDW, { opacity: 0.85, color: '#e7e5e4' }, { hetflag: false });
+          }
+          if (showLigand) {
+            viewer.setStyle({ hetflag: true }, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+          }
+          
+          if (showMisc) {
+            viewer.setStyle({ resn: miscResn }, { sphere: { radius: 0.35, color: 'cyan' } });
+          } else if (showLigand) {
+            viewer.setStyle({ resn: miscResn }, { hidden: true });
+          }
+        } else {
+          if (showLigand) {
+            viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+          }
+        }
+        viewer.render();
+      });
+    };
+
     if ((window as any).$3Dmol) {
       initViewer();
     } else {
@@ -78,64 +144,146 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
           initViewer();
         }
       }, 100);
-      return () => clearInterval(checkInterval);
+      return () => {
+        clearInterval(checkInterval);
+        active = false;
+      };
     }
 
     return () => {
-      if (viewerInstance.current) {
-        viewerInstance.current.removeAllModels();
-      }
+      active = false;
+      if (viewerInstanceLeft.current) viewerInstanceLeft.current.removeAllModels();
+      if (viewerInstanceRight.current) viewerInstanceRight.current.removeAllModels();
+      if (viewerInstanceSingle.current) viewerInstanceSingle.current.removeAllModels();
     };
-  }, [compound.name, compound.pdbId, isVRMode]);
+  }, [compound.name, compound.pdbId, isVRMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Handle live updates to styles (protein/ligand/misc toggles) without recreating the viewer
   useEffect(() => {
-    const viewer = viewerInstance.current;
-    if (!viewer || loading || error || !(window as any).$3Dmol) return;
-
-    viewer.removeAllSurfaces();
-    viewer.setStyle({}, { hidden: true });
+    const viewers = isVRMode 
+      ? [viewerInstanceLeft.current, viewerInstanceRight.current].filter(Boolean)
+      : [viewerInstanceSingle.current].filter(Boolean);
+      
+    if (viewers.length === 0 || loading || error || !(window as any).$3Dmol) return;
 
     const miscResn = ['HOH', 'WAT', 'NH3', 'NA', 'CL', 'MG', 'ZN', 'CA', 'K', 'SO4', 'PO4', 'NAG', 'MAN', 'EDO', 'FMT', 'GOL', 'DMS', 'ACT', 'PEG', 'PGE', 'SO3', 'NO3', 'IOD', 'BR', 'F'];
 
-    if (compound.pdbId) {
-      if (showProtein) {
-        viewer.addSurface((window as any).$3Dmol.SurfaceType.VDW, { opacity: 0.85, color: '#e7e5e4' }, { hetflag: false });
+    viewers.forEach((viewer: any) => {
+      viewer.removeAllSurfaces();
+      viewer.setStyle({}, { hidden: true });
+
+      if (compound.pdbId) {
+        if (showProtein) {
+          viewer.addSurface((window as any).$3Dmol.SurfaceType.VDW, { opacity: 0.85, color: '#e7e5e4' }, { hetflag: false });
+        }
+        if (showLigand) {
+          viewer.setStyle({ hetflag: true }, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+        }
+        
+        if (showMisc) {
+          viewer.setStyle({ resn: miscResn }, { sphere: { radius: 0.35, color: 'cyan' } });
+        } else if (showLigand) {
+          viewer.setStyle({ resn: miscResn }, { hidden: true });
+        }
+      } else {
+        if (showLigand) {
+          viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+        }
       }
-      if (showLigand) {
-        viewer.setStyle({ hetflag: true }, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
-      }
-      
-      if (showMisc) {
-        viewer.setStyle({ resn: miscResn }, { sphere: { radius: 0.35, color: 'cyan' } });
-      } else if (showLigand) {
-        viewer.setStyle({ resn: miscResn }, { hidden: true });
-      }
-    } else {
-      if (showLigand) {
-        viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
-      }
-    }
+      viewer.render();
+    });
+
+  }, [loading, error, showProtein, showLigand, showMisc, compound.pdbId, isVRMode]);
+
+  // Synchronize Left & Right Eye Views under VR Mode in Real-Time
+  useEffect(() => {
+    if (!isVRMode || loading || error) return;
     
-    viewer.render();
+    let active = true;
+    const syncViews = () => {
+      if (!active) return;
+      const vLeft = viewerInstanceLeft.current;
+      const vRight = viewerInstanceRight.current;
+      
+      if (vLeft && vRight) {
+        const viewL = vLeft.getView();
+        const viewR = vRight.getView();
+        
+        if (viewL && viewR) {
+          const strL = JSON.stringify(Array.from(viewL));
+          const strR = JSON.stringify(Array.from(viewR));
+          
+          if (strL !== lastSyncView.current) {
+            // Left view was dragged/zoomed; mirror to Right view
+            vRight.setView(viewL);
+            vRight.render();
+            lastSyncView.current = strL;
+          } else if (strR !== lastSyncView.current) {
+            // Right view was dragged/zoomed; mirror to Left view
+            vLeft.setView(viewR);
+            vLeft.render();
+            lastSyncView.current = strR;
+          }
+        }
+      }
+      requestAnimationFrame(syncViews);
+    };
+    
+    requestAnimationFrame(syncViews);
+    return () => {
+      active = false;
+    };
+  }, [isVRMode, loading, error]);
 
-  }, [loading, error, showProtein, showLigand, showMisc, compound.pdbId]);
-
-  const handleZoomIn = () => viewerInstance.current?.zoom(1.2);
-  const handleZoomOut = () => viewerInstance.current?.zoom(0.8);
-  const handleRecenter = () => viewerInstance.current?.zoomTo();
+  const handleZoomIn = () => {
+    if (isVRMode) {
+      viewerInstanceLeft.current?.zoom(1.2);
+      viewerInstanceRight.current?.zoom(1.2);
+    } else {
+      viewerInstanceSingle.current?.zoom(1.2);
+    }
+  };
+  const handleZoomOut = () => {
+    if (isVRMode) {
+      viewerInstanceLeft.current?.zoom(0.8);
+      viewerInstanceRight.current?.zoom(0.8);
+    } else {
+      viewerInstanceSingle.current?.zoom(0.8);
+    }
+  };
+  const handleRecenter = () => {
+    if (isVRMode) {
+      viewerInstanceLeft.current?.zoomTo();
+      viewerInstanceRight.current?.zoomTo();
+    } else {
+      viewerInstanceSingle.current?.zoomTo();
+    }
+  };
   const toggleSpin = () => {
     const nextState = !isSpinning;
     setIsSpinning(nextState);
-    if (viewerInstance.current) {
-      if (nextState) {
-        viewerInstance.current.spin("y", 1);
-      } else {
-        viewerInstance.current.spin(false);
+    
+    if (isVRMode) {
+      if (viewerInstanceLeft.current) {
+        if (nextState) viewerInstanceLeft.current.spin("y", 1);
+        else viewerInstanceLeft.current.spin(false);
+      }
+      if (viewerInstanceRight.current) {
+        if (nextState) viewerInstanceRight.current.spin("y", 1);
+        else viewerInstanceRight.current.spin(false);
+      }
+    } else {
+      if (viewerInstanceSingle.current) {
+        if (nextState) viewerInstanceSingle.current.spin("y", 1);
+        else viewerInstanceSingle.current.spin(false);
       }
     }
   };
+  
   const toggleFullscreen = () => {
-    const elem = viewerRef.current?.parentElement;
+    const elem = isVRMode 
+      ? viewerRefLeft.current?.parentElement?.parentElement 
+      : viewerRefSingle.current?.parentElement;
     if (!elem) return;
     if (!document.fullscreenElement) {
       elem.requestFullscreen().catch((err: any) => {
@@ -159,7 +307,27 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
           <p className="text-sm mt-2">Try another compound.</p>
         </div>
       )}
-      <div ref={viewerRef} className="w-full h-full" style={{ position: 'relative' }} />
+      
+      {isVRMode ? (
+        <div className="w-full h-full flex divide-x-2 divide-stone-900 bg-black">
+          {/* Left Eye Viewport */}
+          <div className="flex-1 h-full relative">
+            <div ref={viewerRefLeft} className="w-full h-full" style={{ position: 'relative' }} />
+            <div className="absolute top-4 left-4 bg-black/60 px-2 py-1 rounded text-[10px] text-stone-300 font-mono select-none pointer-events-none uppercase z-20 border border-stone-800">
+              Left Eye / Mata Kiri
+            </div>
+          </div>
+          {/* Right Eye Viewport */}
+          <div className="flex-1 h-full relative">
+            <div ref={viewerRefRight} className="w-full h-full" style={{ position: 'relative' }} />
+            <div className="absolute top-4 left-4 bg-black/60 px-2 py-1 rounded text-[10px] text-stone-300 font-mono select-none pointer-events-none uppercase z-20 border border-stone-800">
+              Right Eye / Mata Kanan
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div ref={viewerRefSingle} className="w-full h-full" style={{ position: 'relative' }} />
+      )}
       
       {!isVRMode && !isMobile && (
         <div className="absolute top-6 left-6 text-stone-400 text-xs flex flex-col gap-3 pointer-events-none z-10 bg-stone-900/50 p-4 rounded-xl border border-stone-800 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
@@ -259,7 +427,9 @@ function Structure2DImage({ compound, onEnlarge }: { compound: Compound; onEnlar
   const [error, setError] = useState(false);
   const { language } = useLanguage();
   const t = translations[language];
-  const primaryUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/PNG`;
+  const primaryUrl = compound.id === "sterculia-polysaccharide"
+    ? "/sterculia-polysaccharide-2d.svg"
+    : `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/PNG`;
   const fallbackUrl = compound.structure2DPlaceholder;
   const currentUrl = error ? fallbackUrl : primaryUrl;
 
@@ -880,6 +1050,7 @@ export function DetailsPanel({
 }: DetailsPanelProps) {
   const [is3DModalOpen, setIs3DModalOpen] = useState(false);
   const [isVRMode, setIsVRMode] = useState(false);
+  const [showVRInfo, setShowVRInfo] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [enlargedImage, setEnlargedImage] = useState<{ url: string; title: string } | null>(null);
   const [enlargedChart, setEnlargedChart] = useState<{ compoundName: string } | null>(null);
@@ -993,15 +1164,27 @@ export function DetailsPanel({
                     <Beaker size={16} />
                     2D Structure
                   </h3>
-                  <a 
-                    href={`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=2d`}
-                    download={`${compound.name}.sdf`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors"
-                  >
-                    <Download size={12} /> .sdf
-                  </a>
+                  {compound.id !== "sterculia-polysaccharide" ? (
+                    <a 
+                      href={`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=2d`}
+                      download={`${compound.name}.sdf`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors"
+                    >
+                      <Download size={12} /> .sdf
+                    </a>
+                  ) : (
+                    <a 
+                      href="/sterculia-polysaccharide-2d.svg"
+                      download="sterculia-polysaccharide-2d.svg"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors"
+                    >
+                      <Download size={12} /> .svg
+                    </a>
+                  )}
                 </div>
                 <Structure2DImage 
                   key={compound.id} 
@@ -1194,43 +1377,71 @@ export function DetailsPanel({
                   </div>
 
                   {/* Interactive Charts */}
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Mass Spectrum</p>
-                      <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2">
-                        <MassSpectrumChart compoundName={compound.name} />
+                  {compound.id === "sterculia-polysaccharide" ? (
+                    <div className="bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Info className="text-amber-500 shrink-0 mt-0.5" size={18} />
+                        <div>
+                          <h4 className="text-xs font-bold text-amber-500 uppercase tracking-wider">
+                            {language === 'ms' ? 'Makluman Spektroskopi' : 'Spectral Notice'}
+                          </h4>
+                          <p className="text-sm font-semibold text-stone-800 dark:text-stone-200 mt-1">
+                            {language === 'ms' 
+                              ? 'Maklumat Spektroskopi Tidak Tersedia' 
+                              : 'Unified Spectral Data Unavailable'}
+                          </p>
+                          <p className="text-xs text-stone-600 dark:text-stone-400 mt-2 leading-relaxed">
+                            {language === 'ms'
+                              ? 'Polisakarida Sterculia (Sterculia Polysaccharide) ialah sejenis kopolimer berasid bercabang multi-subunit yang besar (berat molekul tinggi). Oleh kerana sifat heterogeniti yang luas dan struktur makromolekul polidispersi, kaedah spektroskopi standard (spektrum jisim dan spektroskopi NMR monomer tunggal) sukar diperoleh secara konsisten.'
+                              : 'Sterculia Polysaccharide is a complex, highly branched acidic copolymer of high molecular weight. Due to its wide heterogeneous polydispersity and macromolecular branched architecture, standard discrete spectroscopic methods (mass spectrometry and clear single-monomer H-NMR/C-NMR spectra) cannot be consistently unified or represented as a single molecular entity.'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Dynamic Google Scholar Publication Integration widget */}
+                      <div className="pt-4 border-t border-stone-200 dark:border-stone-800">
+                        <PublicationsSection plantName={plant.name} compoundName={compound.name} />
                       </div>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between w-full">
-                        <span>1H NMR Chemical shifts</span>
-                        <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">Click to expand & assignments</span>
-                      </p>
-                      <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-cyan-500/50 transition-colors">
-                        <NMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }} />
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Mass Spectrum</p>
+                        <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2">
+                          <MassSpectrumChart compoundName={compound.name} />
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between w-full">
-                        <span>13C NMR (CNMR) spectrum</span>
-                        <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">Click to view carbon assignments</span>
-                      </p>
-                      <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-purple-500/50 transition-colors">
-                        <CNMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('13C'); setEnlargedChart({ compoundName: compound.name }); }} />
+                      
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between w-full">
+                          <span>1H NMR Chemical shifts</span>
+                          <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">Click to expand & assignments</span>
+                        </p>
+                        <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-cyan-500/50 transition-colors">
+                          <NMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }} />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="pt-2">
-                      <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-2 flex items-center gap-1.5 hover:text-cyan-400 transition-colors cursor-pointer w-max" onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }}>
-                        <Table size={12} /> View Full Spectra &amp; Assignments Table
-                      </p>
-                    </div>
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between w-full">
+                          <span>13C NMR (CNMR) spectrum</span>
+                          <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">Click to view carbon assignments</span>
+                        </p>
+                        <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-purple-500/50 transition-colors">
+                          <CNMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('13C'); setEnlargedChart({ compoundName: compound.name }); }} />
+                        </div>
+                      </div>
 
-                    {/* Dynamic Google Scholar Publication Integration widget */}
-                    <PublicationsSection plantName={plant.name} compoundName={compound.name} />
-                  </div>
+                      <div className="pt-2">
+                        <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-2 flex items-center gap-1.5 hover:text-cyan-400 transition-colors cursor-pointer w-max" onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }}>
+                          <Table size={12} /> View Full Spectra &amp; Assignments Table
+                        </p>
+                      </div>
+
+                      {/* Dynamic Google Scholar Publication Integration widget */}
+                      <PublicationsSection plantName={plant.name} compoundName={compound.name} />
+                    </div>
+                  )}
                 </section>
               )}
             </div>
@@ -1535,7 +1746,19 @@ export function DetailsPanel({
                     <p className="text-xs text-stone-400">Interactive Molecular Viewer</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <button 
+                    onClick={() => setShowVRInfo(!showVRInfo)}
+                    className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors border ${
+                      showVRInfo 
+                        ? 'bg-amber-600/20 text-amber-400 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]' 
+                        : 'bg-stone-800 text-stone-400 border-stone-700 hover:bg-stone-700 hover:text-stone-300'
+                    }`}
+                    title="VR Requirements & Guidelines"
+                  >
+                    <HelpCircle size={18} />
+                    <span className="hidden md:inline">{language === 'ms' ? 'Panduan VR' : 'VR Guide'}</span>
+                  </button>
                   <button 
                     onClick={() => setIsVRMode(!isVRMode)}
                     className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border ${
@@ -1548,7 +1771,10 @@ export function DetailsPanel({
                     {isVRMode ? 'VR Mode: ON' : 'VR Mode: OFF'}
                   </button>
                   <button 
-                    onClick={() => setIs3DModalOpen(false)}
+                    onClick={() => {
+                      setIs3DModalOpen(false);
+                      setShowVRInfo(false);
+                    }}
                     className="text-stone-400 hover:text-white bg-stone-800 hover:bg-stone-700 p-2 rounded-full transition-colors"
                   >
                     <X size={20} />
@@ -1557,7 +1783,78 @@ export function DetailsPanel({
               </div>
               
               {/* Modal Body */}
-              <Interactive3DViewer compound={compound} isVRMode={isVRMode} isMobile={isMobile} />
+              <div className="flex-1 relative flex overflow-hidden">
+                <Interactive3DViewer compound={compound} isVRMode={isVRMode} isMobile={isMobile} />
+                
+                <AnimatePresence>
+                  {showVRInfo && (
+                    <motion.div
+                      initial={{ x: "100%" }}
+                      animate={{ x: 0 }}
+                      exit={{ x: "100%" }}
+                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                      className="absolute inset-y-0 right-0 w-full sm:w-96 bg-stone-950/95 border-l border-stone-800 p-6 z-40 overflow-y-auto shadow-2xl backdrop-blur-md flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between border-b border-stone-800 pb-3 mb-4">
+                          <h4 className="text-white font-bold text-base flex items-center gap-2">
+                            <HelpCircle size={18} className="text-amber-400" />
+                            {language === 'ms' ? 'Panduan & Keperluan VR' : 'VR Requirements & Guide'}
+                          </h4>
+                          <button 
+                            onClick={() => setShowVRInfo(false)}
+                            className="text-stone-400 hover:text-white hover:bg-stone-800 p-1 rounded-lg transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-4 text-xs text-stone-300">
+                          <div>
+                            <span className="font-bold text-amber-400 block mb-1">
+                              {language === 'ms' ? '📱 MOD TELEFON PINTAR (Cardboard/VR Box)' : '📱 MOBILE PHONE MODE (Cardboard/VR Box)'}
+                            </span>
+                            <ul className="list-disc pl-4 space-y-1">
+                              <li><strong>{language === 'ms' ? 'Keperluan Perkakasan' : 'Hardware Ready'}:</strong> {language === 'ms' ? 'Telefon pintar dengan sensor Gyroscope & Accelerometer terbina dalam.' : 'Smartphone with built-in gyroscope and accelerometer.'}</li>
+                              <li><strong>{language === 'ms' ? 'Peranti Fokus' : 'VR Headset Required'}:</strong> {language === 'ms' ? 'Sebarang Google Cardboard, VR Box, atau set kepala VR mudah alih berpusatkan kanta pembesar.' : 'Any Google Cardboard, VR Box, or mobile VR headset with magnifying lenses.'}</li>
+                              <li><strong>{language === 'ms' ? 'Paparan Skrin' : 'Screen Clarity'}:</strong> {language === 'ms' ? 'Resolusi tinggi (1080p ke atas) disyorkan untuk paparan stereoskopik yang jelas.' : 'High-density display (1080p+) is recommended for sub-pixel stereoscopic clarity.'}</li>
+                            </ul>
+                          </div>
+
+                          <div>
+                            <span className="font-bold text-emerald-400 block mb-1">
+                              {language === 'ms' ? '💻 KEPERLUAN PC (Desktop VR / Oculus / Link)' : '💻 PC REQUIREMENTS (Desktop VR / Oculus / Link)'}
+                            </span>
+                            <ul className="list-disc pl-4 space-y-1">
+                              <li><strong>{language === 'ms' ? 'Penyambungan' : 'Connectivity'}:</strong> {language === 'ms' ? 'Buka melalui pelayar kegemaran anda dalam aplikasi Virtual Desktop, Bigscreen, atau pautan VR.' : 'Open via browser inside Virtual Desktop, Bigscreen, or Quest Link browser environment.'}</li>
+                              <li><strong>{language === 'ms' ? 'Mod Sisi-ke-Sisi (SBS)' : 'Side-by-Side (SBS) Projection'}:</strong> {language === 'ms' ? 'Gunakan tetapan main balik SBS dalam perisian VR anda untuk menukar skrin kepada stereoskopik 3D.' : 'Apply SBS 3D overlay preset in your virtual desktop viewer to project depth.'}</li>
+                            </ul>
+                          </div>
+
+                          <div>
+                            <span className="font-bold text-cyan-400 block mb-1">
+                              {language === 'ms' ? '🕶️ INTERAKSI & KAWALAN VR' : '🕶️ INTERACTIONS & VR CONTROLS'}
+                            </span>
+                            <ul className="list-disc pl-4 space-y-1">
+                              <li><strong>{language === 'ms' ? 'Penjejakan Sinkron' : 'Synchronized Eyes'}:</strong> {language === 'ms' ? 'Kedua-dua mata disegerakkan serentak secara masa-nyata. Sebarang pusingan atau zum pada mana-mana mata akan menggerakkan kedua-duanya!' : 'Left and Right eye ports render synchronized views in real time. Manipulating either side rotates or zooms both synchronously.'}</li>
+                              <li><strong>{language === 'ms' ? 'Putaran Auto (Bebas Tangan)' : 'Hands-Free Auto-Rotate'}:</strong> {language === 'ms' ? 'Klik butang "Auto Rotate" (ikon pusingan) di bar kawalan bawah untuk meneroka pengikatan protein tanpa sentuhan fizikal.' : 'Toggle "Auto Rotate" (spin icon) in the bottom toolbox to examine molecular bonds hands-free while your phone is docked inside the headset.'}</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-stone-800 text-center">
+                        <button
+                          onClick={() => setShowVRInfo(false)}
+                          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded-xl transition-colors"
+                        >
+                          {language === 'ms' ? 'Faham & Teruskan' : 'I Understand, Let\'s Visualise'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           </motion.div>
         )}

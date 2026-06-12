@@ -538,35 +538,6 @@ export const spectraData: Record<string, CompoundSpectrum> = {
       { atom: "H-2 (sugar ring)", shift: "3.68", coupling: "m" }
     ]
   },
-  "sterculia-polysaccharide": {
-    compoundId: "sterculia-polysaccharide",
-    compoundName: "Sterculia Polysaccharide",
-    chemicalFormula: "Rhamno-galacturonan copolymer",
-    molecularWeight: "Very High Polymeric Unit",
-    massSpecSource: "MassBank (MoNA)",
-    massSpecType: "ESI-MS (Positive Mode Fragments)",
-    massSpecPeaks: [
-      { x: 165, y: 100 }, // Rhamnose monomer
-      { x: 181, y: 65 },  // Galactose monomer
-      { x: 195, y: 45 }   // Galacturonic acid
-    ],
-    nmrSource: "NMRShiftDB",
-    nmrType: "1H-NMR (400 MHz, D2O, 70C)",
-    nmrPeaks: [
-      { shift: 5.18, intensity: 75, split: 'd', j: 1.5 },    // rhamnose anomeric
-      { shift: 4.58, intensity: 70, split: 'd', j: 7.8 },    // galactose anomeric
-      { shift: 1.25, intensity: 85, split: 'd', j: 6.2 },    // rhamnose methyl group
-      { shift: 3.88, intensity: 60, split: 'm' },            // sugar ring
-      { shift: 3.62, intensity: 60, split: 'm' }             // sugar ring
-    ],
-    nmrTable: [
-      { atom: "H-1 (alpha-L-rhamnose anomeric)", shift: "5.18", coupling: "d, J = 1.5 Hz" },
-      { atom: "H-1 (beta-D-galactose anomeric)", shift: "4.58", coupling: "d, J = 7.8 Hz" },
-      { atom: "CH3 (rhamnose C-6 methyl)", shift: "1.25", coupling: "d, J = 6.2 Hz" },
-      { atom: "H-3,4,5 (copolymer rings)", shift: "3.88", coupling: "m" },
-      { atom: "H-2 (copolymer rings)", shift: "3.62", coupling: "m" }
-    ]
-  },
   "arabin": {
     compoundId: "arabin",
     compoundName: "Arabin / Arabic acid salts",
