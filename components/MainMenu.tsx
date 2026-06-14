@@ -754,7 +754,7 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
           <span className="hidden md:inline">TRL: <span className="text-emerald-650 dark:text-emerald-400 font-bold">{t.demo}</span></span>
         </div>
         <div>
-          <span>© {new Date().getFullYear()} NatureRx • HerbaXplorer</span>
+          <span>© {new Date().getFullYear()} Faculty of Pharmacy • HerbaXplorer</span>
         </div>
       </footer>
     </div>
