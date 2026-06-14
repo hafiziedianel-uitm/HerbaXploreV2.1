@@ -180,7 +180,7 @@ export function PlantViewer({
                           ? 'bg-emerald-500 text-white scale-100 opacity-100'
                           : 'bg-white/95 dark:bg-stone-800/95 text-stone-700 dark:text-stone-300 scale-95 opacity-100 border border-emerald-100 dark:border-stone-700'
                     }`}>
-                      {part.name}
+                      {translateDb(part.name, language)}
                     </div>
                   </motion.button>
                 );

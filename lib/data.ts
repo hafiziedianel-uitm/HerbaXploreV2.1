@@ -865,7 +865,7 @@ export const plantsData: Plant[] = [
   },
   {
     id: "olive-oil",
-    name: "Olive oil",
+    name: "Olive tree",
     scientificName: "Olea europaea",
     synonyms: ["Olive Tree", "European Olive"],
     description: "Fruit mesocarp as a drug. Contains Oleic acid, linoleic acid, palmitic acid, stearic acid, squalene, tocopherols, phytosterols.",
@@ -1095,7 +1095,7 @@ export const plantsData: Plant[] = [
             pdbId: "1RY8",
             pharmacologicalActivity: "Antioxidant, Anti-inflammatory, Vasoprotective, Anticancer, Anti-diabetic.",
             therapeuticActivity: "Capillary protectant.",
-            structure2DPlaceholder: "https://picsum.photos/seed/rutin2d/300/200",
+            structure2DPlaceholder: "/rutin-2d.svg",
             structure3DPlaceholder: "Interactive 3D view for Rutin",
             pharmaceuticalAnalysis: {
               molecularWeight: "610.52 g/mol",

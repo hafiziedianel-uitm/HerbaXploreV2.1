@@ -9,6 +9,348 @@ import { MassSpectrumChart, NMRSpectrumChart, NMRDataTable, CNMRSpectrumChart, C
 import { useLanguage } from "@/lib/LanguageContext";
 import { translations, translateDb } from "@/lib/i18n";
 
+function FunctionalGroupDiagram({ name }: { name: string }) {
+  const lowercaseName = name.toLowerCase();
+
+  // Helper patterns
+  let svgContent = null;
+  let typeLabel = "Functional Group";
+
+  if (lowercaseName.includes("catechol") || lowercaseName.includes("diphenol") || lowercaseName.includes("dihydroxybenzene")) {
+    typeLabel = "Catechol Ring";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Benzene Hexagon */}
+          <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" className="stroke-stone-600 dark:stroke-stone-400" />
+          {/* Benzene Inner Double Bonds */}
+          <line x1="26" y1="38" x2="26" y2="62" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="50" y1="26" x2="74" y2="38" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="50" y1="74" x2="74" y2="62" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          {/* Substituent bonds for OH groups */}
+          <line x1="80" y1="35" x2="98" y2="25" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="80" y1="65" x2="98" y2="75" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        {/* Oxygen atoms */}
+        <text x="100" y="28" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px] font-sans">OH</text>
+        <text x="100" y="79" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px] font-sans">OH</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("carboxylic") || lowercaseName.includes("organic acid")) {
+    typeLabel = "Carboxylic Acid";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* R-Group and C */}
+          <line x1="25" y1="50" x2="55" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+          <text x="15" y="54" className="fill-stone-500 font-mono text-[11px] font-bold">R</text>
+          
+          {/* Carbonyl C=O */}
+          <line x1="52" y1="50" x2="70" y2="22" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="58" y1="50" x2="76" y2="22" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          
+          {/* C-OH single bond */}
+          <line x1="55" y1="50" x2="80" y2="72" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        {/* Heteroatoms */}
+        <text x="73" y="20" className="fill-rose-500 dark:fill-rose-400 font-bold text-[14px]">O</text>
+        <text x="82" y="78" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">OH</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("ester") || lowercaseName.includes("benzoate")) {
+    typeLabel = "Ester Linkage";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* R-Group */}
+          <line x1="20" y1="50" x2="50" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+          <text x="12" y="54" className="fill-stone-500 font-mono text-[11px] font-bold">R</text>
+          
+          {/* Carbonyl C=O */}
+          <line x1="47" y1="50" x2="62" y2="22" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="53" y1="50" x2="68" y2="22" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          
+          {/* C-O-R' */}
+          <line x1="50" y1="50" x2="73" y2="65" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="87" y1="65" x2="117" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+          <text x="120" y="54" className="fill-stone-500 font-mono text-[11px] font-bold">R&apos;</text>
+        </g>
+        {/* Heteroatoms */}
+        <text x="65" y="20" className="fill-rose-500 dark:fill-rose-400 font-bold text-[14px]">O</text>
+        <text x="75" y="72" className="fill-rose-500 dark:fill-rose-400 font-bold text-[14px]">O</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("flavone") || lowercaseName.includes("flavonol") || lowercaseName.includes("chromone")) {
+    typeLabel = "Flavone Core";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Benzene Ring A (Left) */}
+          <polygon points="15,40 35,28 55,40 55,65 35,77 15,65" className="stroke-stone-600 dark:stroke-stone-400" />
+          <line x1="20" y1="43" x2="20" y2="62" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="35" y1="33" x2="50" y2="42" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="35" y1="72" x2="50" y2="63" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+
+          {/* Pyrone Ring C (Middle) - fused with A */}
+          <polygon points="55,40 75,28 95,40 95,65 75,77 55,65" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="2" />
+          
+          {/* Pyrone double bond */}
+          <line x1="88" y1="43" x2="88" y2="62" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="1.2" />
+
+          {/* Ketone C=O at top C4 (placed on 75,77) */}
+          <line x1="73" y1="77" x2="73" y2="92" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="77" y1="77" x2="77" y2="92" className="stroke-emerald-600 dark:stroke-emerald-400" />
+
+          {/* Phenyl Ring B (Attached to C2 at top right 95,40) */}
+          <line x1="95" y1="40" x2="113" y2="28" className="stroke-stone-600 dark:stroke-stone-400" />
+          <polygon points="113,28 131,38 131,58 113,68 95,58 95,38" className="stroke-stone-600 dark:stroke-stone-400" />
+        </g>
+        {/* Ring Oxygen */}
+        <rect x="70" y="21" width="10" height="13" fill="#f5f5f4" className="dark:fill-stone-900" />
+        <text x="71" y="32" className="fill-rose-500 dark:fill-rose-400 font-bold text-[11px]">O</text>
+
+        {/* Ketone O */}
+        <text x="71" y="99" className="fill-rose-500 dark:fill-rose-400 font-bold text-[12px]">O</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("methoxy")) {
+    typeLabel = "Methoxy Group";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <line x1="20" y1="50" x2="57" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+          <text x="12" y="54" className="fill-stone-500 font-mono text-[11px] font-bold">R</text>
+          
+          <line x1="69" y1="50" x2="103" y2="50" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        <text x="58" y="55" className="fill-rose-500 dark:fill-rose-400 font-bold text-[14px]">O</text>
+        <text x="105" y="54" className="fill-stone-800 dark:fill-stone-200 font-bold text-[11px] font-sans">CH₃</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("phenolic") || lowercaseName.includes("phenol") || lowercaseName.includes("phenyl") || lowercaseName.includes("aromatic")) {
+    typeLabel = "Phenolic / Aromatic";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Benzene Ring */}
+          <polygon points="55,30 85,45 85,75 55,90 25,75 25,45" className="stroke-stone-600 dark:stroke-stone-400" />
+          {/* Inside Double Bonds */}
+          <line x1="31" y1="48" x2="31" y2="72" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="55" y1="36" x2="79" y2="48" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="55" y1="84" x2="79" y2="72" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          
+          {/* OH Bond */}
+          <line x1="55" y1="30" x2="55" y2="10" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        <text x="47" y="6" className="fill-rose-500 dark:fill-rose-400 font-bold text-[12px]">OH</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("pyridine")) {
+    typeLabel = "Pyridine Ring";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Benzene with N at bottom */}
+          <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" className="stroke-stone-600 dark:stroke-stone-400" />
+          {/* Pyridine Double bonds */}
+          <line x1="26" y1="38" x2="26" y2="62" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="50" y1="26" x2="74" y2="38" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          
+          <line x1="48" y1="73" x2="25" y2="60" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="1.2" />
+        </g>
+        <rect x="44" y="70" width="12" height="15" fill="#f5f5f4" className="dark:fill-stone-900" />
+        <text x="45" y="82" className="fill-blue-500 dark:fill-cyan-400 font-bold text-[14px]">N</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("pyrrolidine") || lowercaseName.includes("amine")) {
+    typeLabel = "Pyrrolidine Ring";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Five membered ring with N at bottom */}
+          <polygon points="50,25 80,45 68,75 32,75 20,45" className="stroke-stone-600 dark:stroke-stone-400" />
+          {/* Connection to methyl */}
+          <line x1="50" y1="80" x2="50" y2="94" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        <rect x="42" y="70" width="16" height="13" fill="#f5f5f4" className="dark:fill-stone-900" />
+        <text x="44" y="80" className="fill-blue-500 dark:fill-cyan-400 font-bold text-[13px]">N</text>
+        <text x="44" y="99" className="fill-stone-800 dark:fill-stone-200 font-bold text-[10px] font-sans">CH₃</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("aldehyde")) {
+    typeLabel = "Aldehyde Group";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <line x1="20" y1="50" x2="55" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+          <text x="14" y="54" className="fill-stone-500 font-mono text-[11px] font-bold">R</text>
+          
+          <line x1="52" y1="50" x2="70" y2="22" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="58" y1="50" x2="76" y2="22" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          
+          <line x1="55" y1="50" x2="77" y2="68" className="stroke-stone-600 dark:stroke-stone-400" />
+        </g>
+        <text x="73" y="20" className="fill-rose-500 dark:fill-rose-400 font-bold text-[14px]">O</text>
+        <text x="79" y="77" className="fill-stone-600 dark:fill-stone-400 font-bold text-[13px]">H</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("alkene") || lowercaseName.includes("double bond") || lowercaseName.includes("unsaturated")) {
+    typeLabel = "Unsaturated Alkene";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Zigzag ending with double bond in deep color */}
+          <path d="M 15,35 L 35,55 L 55,35 M 95,35 L 115,55" className="stroke-stone-600 dark:stroke-stone-400" />
+          <line x1="55" y1="35" x2="75" y2="55" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="3" />
+          <line x1="55" y1="42" x2="75" y2="62" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="1.5" />
+          <line x1="75" y1="55" x2="95" y2="35" className="stroke-stone-600 dark:stroke-stone-400" />
+        </g>
+        <text x="50" y="75" className="fill-emerald-600 dark:fill-emerald-400 font-bold text-[11px] font-sans">C = C bond</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("methylenedioxy")) {
+    typeLabel = "Methylenedioxy Ring";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Fused Benzene and 5-member dioxy ring */}
+          <polygon points="15,40 37,28 59,40 59,65 37,77 15,65" className="stroke-stone-600 dark:stroke-stone-400" />
+          <line x1="20" y1="43" x2="20" y2="62" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="37" y1="33" x2="54" y2="43" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+          <line x1="37" y1="72" x2="54" y2="62" className="stroke-stone-600 dark:stroke-stone-400" strokeWidth="1.2" />
+
+          {/* Dioxole ring linked to 59,40 and 59,65 */}
+          <line x1="59" y1="40" x2="80" y2="30" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="59" y1="65" x2="80" y2="75" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="92" y1="36" x2="105" y2="52.5" className="stroke-stone-600 dark:stroke-stone-400" />
+          <line x1="92" y1="69" x2="105" y2="52.5" className="stroke-stone-600 dark:stroke-stone-400" />
+        </g>
+        {/* Oxygens */}
+        <text x="81" y="34" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">O</text>
+        <text x="81" y="78" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">O</text>
+        {/* CH2 vertex */}
+        <text x="107" y="56" className="fill-stone-600 dark:fill-stone-400 font-mono text-[9px] font-bold">CH₂</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("allyl") || lowercaseName.includes("propenyl")) {
+    typeLabel = "Unsaturated Tail";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <line x1="15" y1="60" x2="45" y2="40" className="stroke-stone-600 dark:stroke-stone-400" />
+          <line x1="45" y1="40" x2="75" y2="60" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          
+          <line x1="75" y1="57" x2="105" y2="37" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="3" />
+          <line x1="75" y1="63" x2="105" y2="43" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="1.2" />
+        </g>
+        <text x="10" y="70" className="fill-stone-500 font-mono text-[10px] font-bold">Ar</text>
+        <text x="107" y="42" className="fill-stone-500 font-sans text-[10px] font-bold">terminal alkenyl</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("alcohol") || lowercaseName.includes("hydroxyl")) {
+    typeLabel = "Alcohol Group";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <path d="M 15,35 L 45,55 L 75,35" className="stroke-stone-600 dark:stroke-stone-400" />
+          <line x1="75" y1="35" x2="100" y2="50" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        <text x="102" y="55" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">OH</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("aliphatic") || lowercaseName.includes("saturated chain") || lowercaseName.includes("saturated tail")) {
+    typeLabel = "Aliphatic Chain";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <path d="M 15,40 L 30,60 L 45,40 L 60,60 L 75,40 L 90,60 L 105,40" className="stroke-emerald-600 dark:stroke-emerald-400" strokeWidth="2.5" />
+        </g>
+        <text x="107" y="44" className="fill-stone-500 font-sans text-[10px] font-bold">C-C single bonds</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("sulfate")) {
+    typeLabel = "Sulfate Group";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Sulfur centered */}
+          <line x1="50" y1="50" x2="25" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+          
+          {/* Double bonds S=O */}
+          <line x1="47" y1="42" x2="47" y2="20" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="53" y1="42" x2="53" y2="20" className="stroke-emerald-600 dark:stroke-emerald-400" />
+
+          <line x1="47" y1="58" x2="47" y2="80" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="53" y1="58" x2="53" y2="80" className="stroke-emerald-600 dark:stroke-emerald-400" />
+
+          {/* O-R ester */}
+          <line x1="58" y1="50" x2="80" y2="50" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="95" y1="50" x2="115" y2="50" className="stroke-stone-600 dark:stroke-stone-400" />
+        </g>
+        <text x="45" y="54" className="fill-amber-600 font-bold text-[13px]">S</text>
+        <text x="46" y="16" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">O</text>
+        <text x="46" y="92" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">O</text>
+        <rect x="80" y="42" width="16" height="13" fill="#f5f5f4" className="dark:fill-stone-900" />
+        <text x="82" y="54" className="fill-rose-500 dark:fill-rose-400 font-bold text-[13px]">O</text>
+        <text x="117" y="54" className="fill-stone-500 font-mono text-[10px] font-bold">R</text>
+      </svg>
+    );
+  } else if (lowercaseName.includes("sugar") || lowercaseName.includes("glucoside") || lowercaseName.includes("glycoside") || lowercaseName.includes("rutinoside") || lowercaseName.includes("galacturonic") || lowercaseName.includes("disaccharide") || lowercaseName.includes("polysaccharide") || lowercaseName.includes("xylan") || lowercaseName.includes("arabinose") || lowercaseName.includes("polygalacturonic")) {
+    typeLabel = "Carbohydrate Backbone";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Cyclic sugar conformation or ring */}
+          <polygon points="40,25 75,25 90,50 70,75 35,75 20,50" className="stroke-stone-600 dark:stroke-stone-400" />
+          
+          {/* OH groups extending */}
+          <line x1="20" y1="50" x2="10" y2="50" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="35" y1="75" x2="30" y2="90" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="70" y1="75" x2="75" y2="90" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="90" y1="50" x2="105" y2="50" className="stroke-emerald-600 dark:stroke-emerald-400" />
+        </g>
+        <rect x="70" y="18" width="11" height="13" fill="#f5f5f4" className="dark:fill-stone-900" />
+        <text x="71" y="29" className="fill-rose-500 dark:fill-rose-400 font-bold text-[12px]">O</text>
+        
+        {/* OH Labels */}
+        <text x="2" y="54" className="fill-rose-500 dark:fill-rose-400 font-bold text-[10px]">HO</text>
+        <text x="20" y="97" className="fill-rose-500 dark:fill-rose-400 font-bold text-[10px]">OH</text>
+        <text x="71" y="97" className="fill-rose-500 dark:fill-rose-400 font-bold text-[10px]">OH</text>
+        <text x="107" y="54" className="fill-rose-500 dark:fill-rose-400 font-bold text-[10px]">OR</text>
+      </svg>
+    );
+  } else {
+    // Elegant fall-back structure representing a general chemical molecule
+    typeLabel = "Molecular Unit";
+    svgContent = (
+      <svg viewBox="0 0 140 100" className="w-[124px] h-[85px] mx-auto text-stone-800 dark:text-stone-200">
+        <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Benzene with side branches */}
+          <polygon points="50,25 75,38 75,63 50,75 25,63 25,38" className="stroke-stone-600 dark:stroke-stone-400" />
+          <circle cx="50" cy="50" r="14" className="stroke-emerald-600/30 dark:stroke-emerald-400/20 fill-emerald-500/5" strokeDasharray="3,3" />
+          
+          <line x1="75" y1="38" x2="95" y2="28" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="25" y1="63" x2="5" y2="73" className="stroke-emerald-600 dark:stroke-emerald-400" />
+          <line x1="50" y1="25" x2="50" y2="10" className="stroke-stone-600 dark:stroke-stone-400" />
+        </g>
+        <text x="96" y="28" className="fill-rose-500 dark:fill-rose-400 font-bold text-[11px]">R</text>
+        <text x="45" y="8" className="fill-rose-500 dark:fill-rose-400 font-bold text-[11px]">R&apos;</text>
+      </svg>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center p-2 mb-3.5 bg-stone-100/50 dark:bg-stone-900/40 rounded-xl border border-stone-200/50 dark:border-stone-800/80">
+      <div className="relative w-full aspect-[1.4] flex items-center justify-center bg-white dark:bg-stone-950/60 rounded-lg p-2 shadow-sm border border-stone-200/40 dark:border-stone-800/60 overflow-hidden">
+        {/* Accent decorations to look scientific */}
+        <div className="absolute top-1 left-1.5 text-[8px] font-mono text-stone-400 uppercase tracking-widest">{typeLabel}</div>
+        <div className="absolute bottom-1 right-1.5 text-[8px] font-mono text-emerald-500/70 font-semibold">2D SCHEMA</div>
+        {svgContent}
+      </div>
+    </div>
+  );
+}
+
 function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compound, isVRMode: boolean, isMobile?: boolean }) {
   const { language } = useLanguage();
   const viewerRefSingle = useRef<HTMLDivElement>(null);
@@ -440,7 +782,7 @@ function Structure2DImage({ compound, onEnlarge }: { compound: Compound; onEnlar
     >
       <Image 
         src={currentUrl} 
-        alt={`2D structure of ${compound.name}`}
+        alt={language === 'ms' ? `Struktur 2D bagi ${translateDb(compound.name, language)}` : `2D structure of ${compound.name}`}
         fill
         className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
         referrerPolicy="no-referrer"
@@ -1082,7 +1424,7 @@ export function DetailsPanel({
                 className="flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
               >
                 <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                {t.backTo} {part.name}
+                {t.backTo} {translateDb(part.name, language)}
               </button>
             </div>
 
@@ -1091,11 +1433,11 @@ export function DetailsPanel({
                 <Dna size={20} className="sm:w-6 sm:h-6" />
               </div>
               <div className="flex flex-col">
-                <h2 className="text-xl sm:text-2xl font-bold text-stone-800 dark:text-stone-100">{compound.name}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-stone-800 dark:text-stone-100">{translateDb(compound.name, language)}</h2>
                 {compound.percent !== undefined && (
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className="text-xs bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-700 dark:text-emerald-400 font-semibold px-2 py-0.5 rounded-full">
-                      <span className="font-bold">{compound.percent}%</span> {t.presentIn} {part.name}
+                      <span className="font-bold">{compound.percent}%</span> {t.presentIn} {translateDb(part.name, language)}
                     </span>
                   </div>
                 )}
@@ -1115,7 +1457,7 @@ export function DetailsPanel({
                       key={cls}
                       className="text-xs bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-semibold px-2.5 py-1 rounded-lg border border-emerald-500/10 flex items-center gap-1 shrink-0"
                     >
-                      <span>🧪</span> {cls}
+                      <span>🧪</span> {translateDb(cls, language)}
                     </span>
                   ))}
                 </div>
@@ -1132,7 +1474,7 @@ export function DetailsPanel({
                       key={act}
                       className="text-xs bg-blue-500/10 text-blue-800 dark:text-blue-400 font-semibold px-2.5 py-1 rounded-lg border border-blue-500/10 flex items-center gap-1 shrink-0"
                     >
-                      <span>⚡</span> {act}
+                      <span>⚡</span> {translateDb(act, language)}
                     </span>
                   ))}
                 </div>
@@ -1149,7 +1491,7 @@ export function DetailsPanel({
                       key={role}
                       className="text-xs bg-amber-500/10 text-amber-800 dark:text-amber-400 font-semibold px-2.5 py-1 rounded-lg border border-amber-500/10 flex items-center gap-1 shrink-0"
                     >
-                      <span>🛠️</span> {role}
+                      <span>🛠️</span> {translateDb(role, language)}
                     </span>
                   ))}
                 </div>
@@ -1162,7 +1504,7 @@ export function DetailsPanel({
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center gap-2">
                     <Beaker size={16} />
-                    2D Structure
+                    {language === 'ms' ? 'Struktur 2D' : '2D Structure'}
                   </h3>
                   {compound.id !== "sterculia-polysaccharide" ? (
                     <a 
@@ -1189,7 +1531,10 @@ export function DetailsPanel({
                 <Structure2DImage 
                   key={compound.id} 
                   compound={compound} 
-                  onEnlarge={(url) => setEnlargedImage({ url, title: `${compound.name} - 2D Structure` })} 
+                  onEnlarge={(url) => setEnlargedImage({ 
+                    url, 
+                    title: `${translateDb(compound.name, language)} - ${language === 'ms' ? 'Struktur 2D' : '2D Structure'}` 
+                  })} 
                 />
               </section>
 
@@ -1199,7 +1544,7 @@ export function DetailsPanel({
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center gap-2">
                       <Dna size={16} />
-                      3D Binding Interaction {compound.pdbId && <span className="text-emerald-500 font-mono text-xs bg-emerald-500/10 px-1.5 py-0.5 rounded">PDB: {compound.pdbId}</span>}
+                      {language === 'ms' ? 'Struktur Pengikatan 3D' : '3D Binding Interaction'} {compound.pdbId && <span className="text-emerald-500 font-mono text-xs bg-emerald-500/10 px-1.5 py-0.5 rounded">PDB: {compound.pdbId}</span>}
                     </h3>
                     <div className="flex gap-2">
                       <button 
@@ -1265,7 +1610,7 @@ export function DetailsPanel({
                 <section>
                   <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                     <Info size={16} />
-                    {language === 'ms' ? 'Fakta Penting' : 'Key Structural Fact'}
+                    {language === 'ms' ? 'Fakta Struktur Utama' : 'Key Structural Fact'}
                   </h3>
                   <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800/50 p-5 transition-colors duration-300">
                     <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-medium italic">&ldquo;{translateDb(compound.keyFact, language)}&rdquo;</p>
@@ -1281,9 +1626,12 @@ export function DetailsPanel({
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {compound.functionalGroups.map((group, idx) => (
-                      <div key={idx} className="bg-stone-50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-100 dark:border-stone-700 transition-colors duration-300 hover:border-emerald-500/50">
-                        <div className="font-bold text-stone-800 dark:text-stone-200 mb-1">{translateDb(group.name, language)}</div>
-                        <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{translateDb(group.description, language)}</p>
+                      <div key={idx} className="bg-stone-50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-100 dark:border-stone-700 transition-colors duration-300 hover:border-emerald-500/50 flex flex-col justify-between">
+                        <div>
+                          <FunctionalGroupDiagram name={group.name} />
+                          <div className="font-bold text-stone-800 dark:text-stone-200 mb-1">{translateDb(group.name, language)}</div>
+                          <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{translateDb(group.description, language)}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1294,7 +1642,7 @@ export function DetailsPanel({
               <section>
                 <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Activity size={16} />
-                  Pharmacological Activity
+                  {language === 'ms' ? 'Aktiviti Farmakologi' : 'Pharmacological Activity'}
                 </h3>
                 <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800/50 p-5 transition-colors duration-300">
                   <p className="text-stone-700 dark:text-stone-300 leading-relaxed">{translateDb(compound.pharmacologicalActivity, language)}</p>
@@ -1305,7 +1653,7 @@ export function DetailsPanel({
               <section>
                 <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Pill size={16} />
-                  Therapeutic Activity
+                  {language === 'ms' ? 'Aktiviti Terapeutik' : 'Therapeutic Activity'}
                 </h3>
                 <div className="bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 p-5 transition-colors duration-300">
                   <p className="text-stone-700 dark:text-stone-300 leading-relaxed">{translateDb(compound.therapeuticActivity, language)}</p>
@@ -1317,18 +1665,18 @@ export function DetailsPanel({
                 <section>
                   <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Table size={16} />
-                    Chemical Composition Breakdown
+                    {language === 'ms' ? 'Pecahan Komposisi Kimia' : 'Chemical Composition Breakdown'}
                   </h3>
                   <div className="bg-stone-50 dark:bg-stone-800/30 rounded-2xl border border-stone-200/60 dark:border-stone-800 p-5 space-y-4 transition-colors duration-300">
                     <div className="flex justify-between items-center text-xs text-stone-400 font-semibold px-1">
-                      <span>Fatty Acid Component</span>
-                      <span>Percentage / Formula</span>
+                      <span>{language === 'ms' ? 'Komponen Asid Lemak' : 'Fatty Acid Component'}</span>
+                      <span>{language === 'ms' ? 'Peratusan / Formula' : 'Percentage / Formula'}</span>
                     </div>
                     <div className="space-y-3">
                       {compound.composition.map((item, idx) => (
                         <div key={idx} className="space-y-1.5">
                           <div className="flex justify-between items-center text-sm font-medium">
-                            <span className="text-stone-800 dark:text-stone-200">{item.name}</span>
+                            <span className="text-stone-800 dark:text-stone-200">{translateDb(item.name, language)}</span>
                             <div className="flex items-center gap-2">
                               <span className="font-mono text-xs text-stone-500 dark:text-stone-400">{item.formula}</span>
                               <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono text-xs bg-emerald-500/10 px-2 py-0.5 rounded-full">{item.percentage}%</span>
@@ -1346,7 +1694,9 @@ export function DetailsPanel({
                       ))}
                     </div>
                     <p className="text-xs text-stone-500 leading-relaxed pt-2 border-t border-stone-200 dark:border-stone-800/80">
-                      Cocoa butter is composed of a high concentration of saturated and monounsaturated stearic, palmitic, and oleic fatty acids. This unique crystalline structure accounts for its stable, solid consistency at room temperature while allowing it to melt evenly right at average human body temperature.
+                      {language === 'ms'
+                        ? 'Mentega koko terdiri daripada kepekatan tinggi asid lemak stearik, palmitik, dan oleik yang tepu dan monotidaktepu. Struktur kristal yang unik ini menjelaskan konsistensinya yang stabil dan pepejal pada suhu bilik sementara membolehkannya mencair secara sekata pada suhu badan manusia purata.'
+                        : 'Cocoa butter is composed of a high concentration of saturated and monounsaturated stearic, palmitic, and oleic fatty acids. This unique crystalline structure accounts for its stable, solid consistency at room temperature while allowing it to melt evenly right at average human body temperature.'}
                     </p>
                   </div>
                 </section>
@@ -1357,21 +1707,21 @@ export function DetailsPanel({
                 <section className="space-y-5 sm:space-y-6">
                   <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center gap-2">
                     <Beaker size={16} />
-                    Pharmaceutical Analysis
+                    {language === 'ms' ? 'Analisis Farmaseutikal' : 'Pharmaceutical Analysis'}
                   </h3>
                   
                   {/* Text Data */}
                   <div className="grid grid-cols-1 gap-3 bg-stone-50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-100 dark:border-stone-700">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-stone-500 dark:text-stone-400">Molecular Weight:</span>
+                      <span className="text-stone-500 dark:text-stone-400">{language === 'ms' ? 'Berat Molekul:' : 'Molecular Weight:'}</span>
                       <span className="font-mono font-medium text-stone-800 dark:text-stone-200">{compound.pharmaceuticalAnalysis.molecularWeight}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-stone-500 dark:text-stone-400">Nominal mass:</span>
+                      <span className="text-stone-500 dark:text-stone-400">{language === 'ms' ? 'Jisim Nominal:' : 'Nominal mass:'}</span>
                       <span className="font-mono font-medium text-stone-800 dark:text-stone-200">{compound.pharmaceuticalAnalysis.nominalMass}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-stone-500 dark:text-stone-400">Isotope formula:</span>
+                      <span className="text-stone-500 dark:text-stone-400">{language === 'ms' ? 'Formula Isotop:' : 'Isotope formula:'}</span>
                       <span className="font-mono font-medium text-stone-800 dark:text-stone-200">{compound.pharmaceuticalAnalysis.isotopeFormula}</span>
                     </div>
                   </div>
@@ -1406,7 +1756,9 @@ export function DetailsPanel({
                   ) : (
                     <div className="space-y-6">
                       <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Mass Spectrum</p>
+                        <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+                          {language === 'ms' ? 'Spektrum Jisim' : 'Mass Spectrum'}
+                        </p>
                         <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2">
                           <MassSpectrumChart compoundName={compound.name} />
                         </div>
@@ -1414,8 +1766,10 @@ export function DetailsPanel({
                       
                       <div className="space-y-2">
                         <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between w-full">
-                          <span>1H NMR Chemical shifts</span>
-                          <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">Click to expand & assignments</span>
+                          <span>{language === 'ms' ? 'Anjakan Kimia 1H NMR' : '1H NMR Chemical shifts'}</span>
+                          <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">
+                            {language === 'ms' ? 'Ketik untuk membuka & tugasan' : 'Click to expand & assignments'}
+                          </span>
                         </p>
                         <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-cyan-500/50 transition-colors">
                           <NMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }} />
@@ -1424,8 +1778,10 @@ export function DetailsPanel({
 
                       <div className="space-y-2">
                         <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center justify-between w-full">
-                          <span>13C NMR (CNMR) spectrum</span>
-                          <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">Click to view carbon assignments</span>
+                          <span>{language === 'ms' ? 'Spektrum 13C NMR (CNMR)' : '13C NMR (CNMR) spectrum'}</span>
+                          <span className="lowercase text-[9px] text-stone-500 dark:text-stone-400 font-normal">
+                            {language === 'ms' ? 'Ketik untuk melihat tugasan karbon' : 'Click to view carbon assignments'}
+                          </span>
                         </p>
                         <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-purple-500/50 transition-colors">
                           <CNMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('13C'); setEnlargedChart({ compoundName: compound.name }); }} />
@@ -1434,7 +1790,7 @@ export function DetailsPanel({
 
                       <div className="pt-2">
                         <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-2 flex items-center gap-1.5 hover:text-cyan-400 transition-colors cursor-pointer w-max" onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }}>
-                          <Table size={12} /> View Full Spectra &amp; Assignments Table
+                          <Table size={12} /> {language === 'ms' ? 'Lihat Jadual Spektrum & Tugasan Penuh' : 'View Full Spectra & Assignments Table'}
                         </p>
                       </div>
 
@@ -1469,7 +1825,7 @@ export function DetailsPanel({
             </div>
 
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100 mb-2 sm:mb-3">{part.name}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100 mb-2 sm:mb-3">{translateDb(part.name, language)}</h2>
               <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-base sm:text-lg">{translateDb(part.description, language)}</p>
             </div>
 
@@ -1501,7 +1857,7 @@ export function DetailsPanel({
                       className="w-full text-left bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md hover:shadow-emerald-100 dark:hover:shadow-emerald-900/20 transition-all duration-200 rounded-2xl p-5 group flex items-center justify-between"
                     >
                       <div>
-                        <h4 className="text-lg font-bold text-stone-800 dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">{comp.name}</h4>
+                        <h4 className="text-lg font-bold text-stone-800 dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">{translateDb(comp.name, language)}</h4>
                         <p className="text-sm text-stone-500 dark:text-stone-400 mt-1 line-clamp-1">{translateDb(comp.pharmacologicalActivity, language)}</p>
                       </div>
                       <div className="bg-stone-50 dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 p-2 rounded-full transition-colors shrink-0 ml-4">
@@ -1742,8 +2098,12 @@ export function DetailsPanel({
                     <Dna size={20} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">{compound.name} - 3D Binding Interaction</h3>
-                    <p className="text-xs text-stone-400">Interactive Molecular Viewer</p>
+                    <h3 className="text-lg font-bold text-white">
+                      {translateDb(compound.name, language)} - {language === 'ms' ? 'Struktur Pengikatan 3D' : '3D Binding Interaction'}
+                    </h3>
+                    <p className="text-xs text-stone-400">
+                      {language === 'ms' ? 'Pemapar Molekul Interaktif' : 'Interactive Molecular Viewer'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-4">

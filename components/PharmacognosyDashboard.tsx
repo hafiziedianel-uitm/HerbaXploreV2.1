@@ -301,7 +301,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                     onClick={handleBackToPart}
                     className={`hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors ${!selectedCompound ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : ''}`}
                   >
-                    {selectedPart.name}
+                    {translateDb(selectedPart.name, language)}
                   </button>
                 </>
               )}
@@ -309,7 +309,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               {selectedCompound && (
                 <>
                   <span className="text-stone-300 dark:text-stone-600">/</span>
-                  <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{selectedCompound.name}</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{translateDb(selectedCompound.name, language)}</span>
                 </>
               )}
             </div>
