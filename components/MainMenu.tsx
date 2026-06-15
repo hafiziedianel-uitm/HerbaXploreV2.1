@@ -569,28 +569,68 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
               </AnimatePresence>
             </div>
 
-            {/* COPYRIGHT & DATA EXTRACTION DISCLAIMER */}
-            <div className="mt-8 p-5 bg-amber-500/5 dark:bg-amber-500/2 rounded-2xl border border-amber-500/20 dark:border-amber-500/10 flex flex-col sm:flex-row gap-3.5 items-start">
-              <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-405 rounded-xl shrink-0">
-                <AlertCircle size={20} />
+            {/* COPYRIGHT & DISCLAIMERS SECTION */}
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* COPYRIGHT & DATA EXTRACTION DISCLAIMER */}
+              <div className="p-5 bg-amber-500/5 dark:bg-amber-500/2 rounded-2xl border border-amber-500/20 dark:border-amber-500/10 flex gap-3.5 items-start">
+                <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl shrink-0">
+                  <AlertCircle size={20} />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
+                    {language === 'ms' 
+                      ? 'Penafian Pengambilan Data & Hak Cipta Rujukan' 
+                      : 'Data Extraction & Reference Copyright Disclaimer'}
+                  </h4>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed">
+                    {language === 'ms' ? (
+                      <>
+                        Bagi memudahkan pengajaran serta peningkatan kebolehcapaian maklumat berpusat yang mesra pelajar, HerbaXplorer memaparkan kompilasi maklumat saintifik dan rujukan luaran yang diekstrak secara terus daripada pangkalan data awam berwibawa (seperti <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, dan <strong>Google Scholar</strong>). Segala tanda dagang, hak milik asal, serta hak cipta penulisan/pangkalan data tersebut kekal mutlak di bawah hak proprietary pemilik dan sistem rujukan asal yang rasmi. HerbaXplorer mahupun Fakulti Farmasi tidak menuntut sebarang pemilikan atau hak cipta ke atas data yang diintegrasikan ini, di mana penggunaan data ini bertujuan mempercepatkan navigasi rujukan pelajar secara terkawal.
+                      </>
+                    ) : (
+                      <>
+                        To facilitate optimized digital teaching and centralize informational accessibility for pharmacy students, HerbaXplorer aggregates scientific records and references retrieved directly from external public repositories and state registries (such as <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, and <strong>Google Scholar</strong>). All intellectual property, trademarks, and associated copyright protections remain strictly proprietary to their respective official platforms, registers, and authors. Neither the Faculty of Pharmacy nor HerbaXplorer claims ownership, title, or copyright over this integrated reference data, which is presented solely to enable seamless scholastic navigation and study maneuvers.
+                      </>
+                    )}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
-                  {language === 'ms' 
-                    ? 'Penafian Pengambilan Data & Hak Cipta Rujukan' 
-                    : 'Data Extraction & Reference Copyright Disclaimer'}
-                </h4>
-                <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed">
-                  {language === 'ms' ? (
-                    <>
-                      Bagi memudahkan pengajaran serta peningkatan kebolehcapaian maklumat berpusat yang mesra pelajar, HerbaXplorer memaparkan kompilasi maklumat saintifik dan rujukan luaran yang diekstrak secara terus daripada pangkalan data awam berwibawa (seperti <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, dan <strong>Google Scholar</strong>). Segala tanda dagang, hak milik asal, serta hak cipta penulisan/pangkalan data tersebut kekal mutlak di bawah hak proprietary pemilik dan sistem rujukan asal yang rasmi. HerbaXplorer mahupun Fakulti Farmasi tidak menuntut sebarang pemilikan atau hak cipta ke atas data yang diintegrasikan ini, di mana penggunaan data ini bertujuan mempercepatkan navigasi rujukan pelajar secara terkawal.
-                    </>
-                  ) : (
-                    <>
-                      To facilitate optimized digital teaching and centralize informational accessibility for pharmacy students, HerbaXplorer aggregates scientific records and references retrieved directly from external public repositories and state registries (such as <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, and <strong>Google Scholar</strong>). All intellectual property, trademarks, and associated copyright protections remain strictly proprietary to their respective official platforms, registers, and authors. Neither the Faculty of Pharmacy nor HerbaXplorer claims ownership, title, or copyright over this integrated reference data, which is presented solely to enable seamless scholastic navigation and study maneuvers.
-                    </>
-                  )}
-                </p>
+
+              {/* INTELLECTUAL PROPERTY & COMPILATION REGISTRATION */}
+              <div className="p-5 bg-emerald-500/5 dark:bg-emerald-500/2 rounded-2xl border border-emerald-500/20 dark:border-emerald-500/10 flex gap-3.5 items-start">
+                <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl shrink-0">
+                  <ShieldCheck size={20} />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
+                    {language === 'ms' 
+                      ? 'Pemilikan Harta Intelek & Pendaftaran Karya' 
+                      : 'Intellectual Property Ownership & Work Registration'}
+                  </h4>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed whitespace-pre-line">
+                    {language === 'ms' ? (
+                      <>
+                        Karya ini didaftarkan di bawah kategori Karya Sastera sebagai sebuah perisian komputer dan aplikasi web pendidikan. Perlindungan hak cipta ini merangkumi dua (2) komponen utama ciptaan asal pembangun (Kumpulan NatureRx, UiTM):
+                        {"\n\n"}
+                        <strong>1. Komponen Literasi & Pengekodan (Source Code & Database Compilation):</strong>{"\n"}
+                        Merangkumi himpunan kod sumber (source code), skrip pengaturcaraan, dan seni bina sistem berasaskan awan (cloud-based architecture) yang dibangunkan secara asli bagi membolehkan fungsi visualisasi 3D, navigasi modul pembelajaran, dan penyepaduan (integration) data luaran (seperti NPRA dan PubChem) beroperasi secara masa nyata. Ia juga mencakupi teks modul asal dan struktur susun atur pangkalan data pendidikan (Knowledge Checker) yang direka khusus untuk kursus Farmakognosi.
+                        {"\n\n"}
+                        <strong>2. Komponen Reka Bentuk Antaramuka & Pengalaman Pengguna (UI/UX Design Compilation):</strong>{"\n"}
+                        Merangkumi kompilasi visual interaktif, reka letak (layout), hierarki maklumat, dan aliran navigasi sistem (user flow). Reka bentuk UI/UX ini merangkumi elemen antaramuka papan pemuka (dashboard), kawalan manipulasi model 3D (putaran dan zum), serta susun atur responsif yang dioptimumkan untuk pelbagai peranti pintar bagi tujuan pengajaran dan pembelajaran (PdP) sains yang efektif.
+                      </>
+                    ) : (
+                      <>
+                        {"This work is registered under the Literary Work category as a computer program and educational web application. This copyright protection covers two (2) primary components of the developer's original creation (Group NatureRx, UiTM):"}
+                        {"\n\n"}
+                        <strong>1. Literacy & Coding Component (Source Code & Database Compilation):</strong>{"\n"}
+                        Comprises the suite of source code, programming scripts, and cloud-based architecture natively engineered to support real-time 3D visualizations, custom learning module navigations, and integration with external platforms (such as NPRA and PubChem). It also covers original educational texts, layouts, and knowledge evaluation questionnaires custom-built for the Pharmacognosy course.
+                        {"\n\n"}
+                        <strong>2. Interface Design & User Experience Component (UI/UX Design Compilation):</strong>{"\n"}
+                        Encompasses interactive visual comps, layouts, informational hierarchy, and system navigation flow. This UI/UX compilation covers responsive dashboards, 3D molecular manipulation engines (rotation and zooming), and adaptive view layouts crafted to maximize scientific teaching and learning (T&L).
+                      </>
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
