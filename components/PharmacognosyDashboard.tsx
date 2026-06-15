@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
 import { DetailsPanel } from "./DetailsPanel";
-import { Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, SlidersHorizontal, Filter, RotateCcw, Home, Languages } from "lucide-react";
+import { Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, SlidersHorizontal, Filter, RotateCcw, Home, Languages, AlertCircle, ShieldCheck } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -64,6 +64,20 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
   const [selectedPharmacology, setSelectedPharmacology] = useState<string>("All");
   const [selectedFormulation, setSelectedFormulation] = useState<string>("All");
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showDisclaimer, setShowDisclaimer] = useState<boolean>(true);
+
+  useEffect(() => {
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
+    const accepted = localStorage.getItem("herbaXplorerDisclaimerAccepted");
+    if (accepted === "true") {
+      setShowDisclaimer(false); // eslint-disable-line react-hooks/set-state-in-effect
+    }
+  }, []);
+
+  const handleAcceptDisclaimer = () => {
+    localStorage.setItem("herbaXplorerDisclaimerAccepted", "true");
+    setShowDisclaimer(false);
+  };
 
   const filteredPlants = plantsData.filter((p) => {
     // 1. Search Query text match
@@ -648,6 +662,129 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
           </div>
         </div>
       </div>
+
+      {/* Disclaimer Overlay Modal */}
+      <AnimatePresence>
+        {showDisclaimer && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-900/80 backdrop-blur-md overflow-y-auto"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="w-full max-w-4xl bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-2xl p-6 md:p-8 max-h-[90vh] flex flex-col my-8"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-center pb-4 border-b border-stone-150 dark:border-stone-800/80 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-emerald-550/10 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm md:text-base font-extrabold text-stone-800 dark:text-stone-100 uppercase tracking-wide">
+                      {language === 'ms' ? 'Penafian & Maklumat Hak Cipta' : 'Disclaimer & Copyright Information'}
+                    </h3>
+                    <p className="text-[10px] text-stone-400 dark:text-stone-500">
+                      Faculty of Pharmacy • UiTM KIK Project HerbaXplorer
+                    </p>
+                  </div>
+                </div>
+
+                {/* Language quick switcher */}
+                <button
+                  type="button"
+                  onClick={() => setLanguage(language === 'en' ? 'ms' : 'en')}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-xs font-semibold border border-stone-200/20"
+                >
+                  <Languages size={12} />
+                  <span>{language === 'en' ? 'Bahasa Melayu' : 'English'}</span>
+                </button>
+              </div>
+
+              {/* Content Body */}
+              <div className="flex-1 overflow-y-auto py-5 pr-1 space-y-6 text-xs text-stone-600 dark:text-stone-300 leading-relaxed scrollbar-thin">
+                {/* Section 1: Copyright Registration */}
+                <div className="bg-emerald-500/[0.03] dark:bg-emerald-500/[0.01] p-4 rounded-2xl border border-emerald-500/10 dark:border-emerald-500/5 space-y-3">
+                  <div className="flex gap-2.5 items-start">
+                    <ShieldCheck className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" size={18} />
+                    <div className="space-y-1.5">
+                      <h4 className="font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wide text-[11px]">
+                        {language === 'ms' 
+                          ? '1. Pemilikan Harta Intelek & Pendaftaran Karya' 
+                          : '1. Intellectual Property Ownership & Work Registration'}
+                      </h4>
+                      <p className="text-[11px] whitespace-pre-line leading-relaxed text-stone-600 dark:text-stone-400">
+                        {language === 'ms' ? (
+                          <>
+                            Karya ini didaftarkan di bawah kategori Karya Sastera sebagai sebuah perisian komputer dan aplikasi web pendidikan. Perlindungan hak cipta ini merangkumi dua (2) komponen utama ciptaan asal pembangun (Kumpulan NatureRx, UiTM):
+                            {"\n\n"}
+                            <strong>• Komponen Literasi & Pengekodan (Source Code & Database Compilation):</strong>{"\n"}
+                            Merangkumi himpunan kod sumber (source code), skrip pengaturcaraan, dan seni bina sistem berasaskan awan (cloud-based architecture) yang dibangunkan secara asli bagi membolehkan fungsi visualisasi 3D, navigasi modul pembelajaran, dan penyepaduan (integration) data luaran (seperti NPRA dan PubChem) beroperasi secara masa nyata. Ia juga mencakupi teks modul asal dan struktur susun atur pangkalan data pendidikan (Knowledge Checker) yang direka khusus untuk kursus Farmakognosi.
+                            {"\n\n"}
+                            <strong>• Komponen Reka Bentuk Antaramuka & Pengalaman Pengguna (UI/UX Design Compilation):</strong>{"\n"}
+                            Merangkumi kompilasi visual interaktif, reka letak (layout), hierarki maklumat, dan aliran navigasi sistem (user flow). Reka bentuk UI/UX ini merangkumi elemen antaramuka papan pemuka (dashboard), kawalan manipulasi model 3D (putaran dan zum), serta susun atur responsif yang dioptimumkan untuk pelbagai peranti pintar bagi tujuan pengajaran dan pembelajaran (PdP) sains yang efektif.
+                          </>
+                        ) : (
+                          <>
+                            {"This work is registered under the Literary Work category as a computer program and educational web application. This copyright protection covers two (2) primary components of the developer's original creation (Group NatureRx, UiTM):"}
+                            {"\n\n"}
+                            <strong>• Literacy & Coding Component (Source Code & Database Compilation):</strong>{"\n"}
+                            Comprises the suite of source code, programming scripts, and cloud-based architecture natively engineered to support real-time 3D visualizations, custom learning module navigations, and integration with external platforms (such as NPRA and PubChem). It also covers original educational texts, layouts, and knowledge evaluation questionnaires custom-built for the Pharmacognosy course.
+                            {"\n\n"}
+                            <strong>• Interface Design & User Experience Component (UI/UX Design Compilation):</strong>{"\n"}
+                            Encompasses interactive visual comps, layouts, informational hierarchy, and system navigation flow. This UI/UX compilation covers responsive dashboards, 3D molecular manipulation engines (rotation and zooming), and adaptive view layouts crafted to maximize scientific teaching and learning (T&L).
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Data Extraction Disclaimer */}
+                <div className="bg-amber-500/[0.03] dark:bg-amber-500/[0.01] p-4 rounded-2xl border border-amber-500/10 dark:border-amber-500/5 space-y-3">
+                  <div className="flex gap-2.5 items-start">
+                    <AlertCircle className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={18} />
+                    <div className="space-y-1.5">
+                      <h4 className="font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wide text-[11px]">
+                        {language === 'ms' 
+                          ? '2. Penafian Pengambilan Data & Hak Cipta Rujukan' 
+                          : '2. Data Extraction & Reference Copyright Disclaimer'}
+                      </h4>
+                      <p className="text-[11px] leading-relaxed text-stone-600 dark:text-stone-400">
+                        {language === 'ms' ? (
+                          <>
+                            Bagi memudahkan pengajaran serta peningkatan kebolehcapaian maklumat berpusat yang mesra pelajar, HerbaXplorer memaparkan kompilasi maklumat saintifik dan rujukan luaran yang diekstrak secara terus daripada pangkalan data awam berwibawa (seperti <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, dan <strong>Google Scholar</strong>). Segala tanda dagang, hak milik asal, serta hak cipta penulisan/pangkalan data tersebut kekal mutlak di bawah hak proprietary pemilik dan sistem rujukan asal yang rasmi. HerbaXplorer mahupun Fakulti Farmasi tidak menuntut sebarang pemilikan atau hak cipta ke atas data yang diintegrasikan ini, di mana penggunaan data ini bertujuan mempercepatkan navigasi rujukan pelajar secara terkawal.
+                          </>
+                        ) : (
+                          <>
+                            To facilitate optimized digital teaching and centralize informational accessibility for pharmacy students, HerbaXplorer aggregates scientific records and references retrieved directly from external public repositories and state registries (such as <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, and <strong>Google Scholar</strong>). All intellectual property, trademarks, and associated copyright protections remain strictly proprietary to their respective official platforms, registers, and authors. Neither the Faculty of Pharmacy nor HerbaXplorer claims ownership, title, or copyright over this integrated reference data, which is presented solely to enable seamless scholastic navigation and study maneuvers.
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-4 border-t border-stone-150 dark:border-stone-800/80 flex items-center justify-end shrink-0 gap-3">
+                <button
+                  type="button"
+                  onClick={handleAcceptDisclaimer}
+                  className="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-750 text-white dark:bg-emerald-500 dark:hover:bg-emerald-600 text-xs font-bold rounded-xl transition shadow-md shadow-emerald-500/10 active:scale-95 duration-150"
+                >
+                  {language === 'ms' ? 'Saya Faham & Setuju' : 'I Understand & Agree'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
