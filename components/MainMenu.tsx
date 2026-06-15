@@ -26,7 +26,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Play,
-  Pause
+  Pause,
+  AlertCircle
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -566,6 +567,31 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+
+            {/* COPYRIGHT & DATA EXTRACTION DISCLAIMER */}
+            <div className="mt-8 p-5 bg-amber-500/5 dark:bg-amber-500/2 rounded-2xl border border-amber-500/20 dark:border-amber-500/10 flex flex-col sm:flex-row gap-3.5 items-start">
+              <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-405 rounded-xl shrink-0">
+                <AlertCircle size={20} />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
+                  {language === 'ms' 
+                    ? 'Penafian Pengambilan Data & Hak Cipta Rujukan' 
+                    : 'Data Extraction & Reference Copyright Disclaimer'}
+                </h4>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed">
+                  {language === 'ms' ? (
+                    <>
+                      Bagi memudahkan pengajaran serta peningkatan kebolehcapaian maklumat berpusat yang mesra pelajar, HerbaXplorer memaparkan kompilasi maklumat saintifik dan rujukan luaran yang diekstrak secara terus daripada pangkalan data awam berwibawa (seperti <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, dan <strong>Google Scholar</strong>). Segala tanda dagang, hak milik asal, serta hak cipta penulisan/pangkalan data tersebut kekal mutlak di bawah hak proprietary pemilik dan sistem rujukan asal yang rasmi. HerbaXplorer mahupun Fakulti Farmasi tidak menuntut sebarang pemilikan atau hak cipta ke atas data yang diintegrasikan ini, di mana penggunaan data ini bertujuan mempercepatkan navigasi rujukan pelajar secara terkawal.
+                    </>
+                  ) : (
+                    <>
+                      To facilitate optimized digital teaching and centralize informational accessibility for pharmacy students, HerbaXplorer aggregates scientific records and references retrieved directly from external public repositories and state registries (such as <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, and <strong>Google Scholar</strong>). All intellectual property, trademarks, and associated copyright protections remain strictly proprietary to their respective official platforms, registers, and authors. Neither the Faculty of Pharmacy nor HerbaXplorer claims ownership, title, or copyright over this integrated reference data, which is presented solely to enable seamless scholastic navigation and study maneuvers.
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
           </motion.div>
 

@@ -214,8 +214,8 @@ export function PlantViewer({
               <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold shrink-0 mt-0.5 border border-emerald-500/10">2</div>
               <p className="leading-relaxed">
                 {language === 'ms' 
-                  ? 'Ketik mana-mana bahagian tetingkap bercahaya (cth. Daun, Bunga) untuk memeriksa sebatian bioaktif.' 
-                  : 'Tap any glowing parts (e.g., leaves, bark) to inspect extracted bioactive compounds.'}
+                  ? 'Ketik mana-mana bahagian tetingkap bercahaya untuk memeriksa sebatian bioaktif.' 
+                  : 'Tap any glowing parts to inspect extracted bioactive compounds.'}
               </p>
             </li>
             <li className="flex items-start gap-2.5">
