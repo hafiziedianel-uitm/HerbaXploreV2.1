@@ -759,10 +759,14 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                         {language === 'ms' ? (
                           <>
                             Bagi memudahkan pengajaran serta peningkatan kebolehcapaian maklumat berpusat yang mesra pelajar, HerbaXplorer memaparkan kompilasi maklumat saintifik dan rujukan luaran yang diekstrak secara terus daripada pangkalan data awam berwibawa (seperti <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, dan <strong>Google Scholar</strong>). Segala tanda dagang, hak milik asal, serta hak cipta penulisan/pangkalan data tersebut kekal mutlak di bawah hak proprietary pemilik dan sistem rujukan asal yang rasmi. HerbaXplorer mahupun Fakulti Farmasi tidak menuntut sebarang pemilikan atau hak cipta ke atas data yang diintegrasikan ini, di mana penggunaan data ini bertujuan mempercepatkan navigasi rujukan pelajar secara terkawal.
+                            {"\n\n"}
+                            Di samping itu, HerbaXplorer tidak menuntut sebarang hak milik atau memegang hak cipta ke atas imej dan gambar tumbuhan yang dipaparkan, di mana gambar-gambar tersebut diperolehi daripada carian Google (Google Search) secara awam khusus untuk tujuan bantuan visual pengajaran bilik darjah sahaja.
                           </>
                         ) : (
                           <>
                             To facilitate optimized digital teaching and centralize informational accessibility for pharmacy students, HerbaXplorer aggregates scientific records and references retrieved directly from external public repositories and state registries (such as <strong>Quest 3+ (NPRA Malaysia)</strong>, <strong>NMRShiftDB</strong>, <strong>PubChem</strong>, and <strong>Google Scholar</strong>). All intellectual property, trademarks, and associated copyright protections remain strictly proprietary to their respective official platforms, registers, and authors. Neither the Faculty of Pharmacy nor HerbaXplorer claims ownership, title, or copyright over this integrated reference data, which is presented solely to enable seamless scholastic navigation and study maneuvers.
+                            {"\n\n"}
+                            Furthermore, HerbaXplorer does not claim ownership or hold copyright over the pictures or illustrations of the plants displayed throughout the application, which are retrieved from public Google Search indexing specifically for classroom visual aid purposes.
                           </>
                         )}
                       </p>
