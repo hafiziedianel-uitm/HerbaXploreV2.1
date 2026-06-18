@@ -2,13 +2,14 @@
 
 import { Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle, ZoomIn, ZoomOut, RotateCcw, Crosshair } from "lucide-react";
+import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle, ZoomIn, ZoomOut, RotateCcw, Crosshair, Volume2, Pause, Play, Square } from "lucide-react";
 import { fetchWithCache } from "@/lib/offlineCache";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { MassSpectrumChart, NMRSpectrumChart, NMRDataTable, CNMRSpectrumChart, CNMRDataTable } from "./SpectrumCharts";
 import { useLanguage } from "@/lib/LanguageContext";
 import { translations, translateDb } from "@/lib/i18n";
+import { TextToSpeech } from "./TextToSpeech";
 
 function FunctionalGroupDiagram({ name }: { name: string }) {
   const lowercaseName = name.toLowerCase();
@@ -354,6 +355,7 @@ function FunctionalGroupDiagram({ name }: { name: string }) {
 
 function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compound, isVRMode: boolean, isMobile?: boolean }) {
   const { language } = useLanguage();
+  const containerRef = useRef<HTMLDivElement>(null);
   const viewerRefSingle = useRef<HTMLDivElement>(null);
   const viewerRefLeft = useRef<HTMLDivElement>(null);
   const viewerRefRight = useRef<HTMLDivElement>(null);
@@ -373,33 +375,37 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
 
   // Resize when fullscreen toggles or browser window resizes
   useEffect(() => {
-    const viewers = [
-      viewerInstanceSingle.current,
-      viewerInstanceLeft.current,
-      viewerInstanceRight.current
-    ].filter(Boolean);
-    
-    if (viewers.length > 0) {
-      const triggerResize = () => {
-        viewers.forEach(v => {
-          v.resize();
-          v.render();
+    const triggerResize = () => {
+      try {
+        const currentViewers = [
+          viewerInstanceSingle.current,
+          viewerInstanceLeft.current,
+          viewerInstanceRight.current
+        ].filter(Boolean);
+        currentViewers.forEach(v => {
+          if (v && typeof v.resize === 'function') {
+            v.resize();
+            v.render();
+          }
         });
-      };
-      // Trigger multiple ticks to ensure layout completes
-      triggerResize();
-      const t1 = setTimeout(triggerResize, 60);
-      const t2 = setTimeout(triggerResize, 150);
-      const t3 = setTimeout(triggerResize, 350);
+      } catch (e) {
+        console.warn("Resize handler error:", e);
+      }
+    };
 
-      window.addEventListener('resize', triggerResize);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
-        window.removeEventListener('resize', triggerResize);
-      };
-    }
+    // Trigger multiple ticks to ensure layout completes
+    triggerResize();
+    const t1 = setTimeout(triggerResize, 60);
+    const t2 = setTimeout(triggerResize, 150);
+    const t3 = setTimeout(triggerResize, 350);
+
+    window.addEventListener('resize', triggerResize);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', triggerResize);
+    };
   }, [isSimulatedFullscreen, isVRMode, loading]);
 
   useEffect(() => {
@@ -437,34 +443,48 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
 
         const setupAViewer = (ref: HTMLDivElement | null, modelData: string, isPdbFormat: boolean) => {
           if (!ref) return null;
-          ref.innerHTML = '';
-          const viewer = (window as any).$3Dmol.createViewer(ref, {
-            backgroundColor: isVRMode ? 'black' : '#1c1917', // stone-900 or black
-          });
-          viewer.addModel(modelData, isPdbFormat ? "pdb" : "sdf");
-          viewer.zoomTo();
-          return viewer;
+          try {
+            ref.innerHTML = '';
+            if (!(window as any).$3Dmol) return null;
+            const viewer = (window as any).$3Dmol.createViewer(ref, {
+              backgroundColor: isVRMode ? 'black' : '#1c1917', // stone-900 or black
+            });
+            viewer.addModel(modelData, isPdbFormat ? "pdb" : "sdf");
+            viewer.zoomTo();
+            return viewer;
+          } catch (e) {
+            console.error("Failed to setup 3Dmol viewer:", e);
+            return null;
+          }
         };
 
         if (isVRMode) {
           // Give DOM elements a render tick to be populated in VRMode
           setTimeout(() => {
             if (!active) return;
-            if (viewerRefLeft.current && viewerRefRight.current) {
-              viewerInstanceLeft.current = setupAViewer(viewerRefLeft.current, isPdb ? pdbData : sdfData, isPdb);
-              viewerInstanceRight.current = setupAViewer(viewerRefRight.current, isPdb ? pdbData : sdfData, isPdb);
-              
-              // Trigger styles and rendering immediately
-              applyViewerStyles([viewerInstanceLeft.current, viewerInstanceRight.current]);
+            try {
+              if (viewerRefLeft.current && viewerRefRight.current) {
+                viewerInstanceLeft.current = setupAViewer(viewerRefLeft.current, isPdb ? pdbData : sdfData, isPdb);
+                viewerInstanceRight.current = setupAViewer(viewerRefRight.current, isPdb ? pdbData : sdfData, isPdb);
+                
+                // Trigger styles and rendering immediately
+                applyViewerStyles([viewerInstanceLeft.current, viewerInstanceRight.current]);
+              }
+            } catch (e) {
+              console.warn("Error setting up VR viewers:", e);
             }
             setLoading(false);
           }, 50);
         } else {
           setTimeout(() => {
             if (!active) return;
-            if (viewerRefSingle.current) {
-              viewerInstanceSingle.current = setupAViewer(viewerRefSingle.current, isPdb ? pdbData : sdfData, isPdb);
-              applyViewerStyles([viewerInstanceSingle.current]);
+            try {
+              if (viewerRefSingle.current) {
+                viewerInstanceSingle.current = setupAViewer(viewerRefSingle.current, isPdb ? pdbData : sdfData, isPdb);
+                applyViewerStyles([viewerInstanceSingle.current]);
+              }
+            } catch (e) {
+              console.warn("Error setting up single viewer:", e);
             }
             setLoading(false);
           }, 50);
@@ -527,9 +547,33 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
 
     return () => {
       active = false;
-      if (viewerInstanceLeft.current) viewerInstanceLeft.current.removeAllModels();
-      if (viewerInstanceRight.current) viewerInstanceRight.current.removeAllModels();
-      if (viewerInstanceSingle.current) viewerInstanceSingle.current.removeAllModels();
+      try {
+        if (viewerInstanceLeft.current && typeof viewerInstanceLeft.current.removeAllModels === 'function') {
+          viewerInstanceLeft.current.removeAllModels();
+          viewerInstanceLeft.current.removeAllSurfaces();
+        }
+      } catch (e) {
+        console.warn("Cleanup left viewer error:", e);
+      }
+      try {
+        if (viewerInstanceRight.current && typeof viewerInstanceRight.current.removeAllModels === 'function') {
+          viewerInstanceRight.current.removeAllModels();
+          viewerInstanceRight.current.removeAllSurfaces();
+        }
+      } catch (e) {
+        console.warn("Cleanup right viewer error:", e);
+      }
+      try {
+        if (viewerInstanceSingle.current && typeof viewerInstanceSingle.current.removeAllModels === 'function') {
+          viewerInstanceSingle.current.removeAllModels();
+          viewerInstanceSingle.current.removeAllSurfaces();
+        }
+      } catch (e) {
+        console.warn("Cleanup single viewer error:", e);
+      }
+      viewerInstanceLeft.current = null;
+      viewerInstanceRight.current = null;
+      viewerInstanceSingle.current = null;
     };
   }, [compound.name, compound.pdbId, isVRMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -544,28 +588,34 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
     const miscResn = ['HOH', 'WAT', 'NH3', 'NA', 'CL', 'MG', 'ZN', 'CA', 'K', 'SO4', 'PO4', 'NAG', 'MAN', 'EDO', 'FMT', 'GOL', 'DMS', 'ACT', 'PEG', 'PGE', 'SO3', 'NO3', 'IOD', 'BR', 'F'];
 
     viewers.forEach((viewer: any) => {
-      viewer.removeAllSurfaces();
-      viewer.setStyle({}, { hidden: true });
+      try {
+        if (viewer && typeof viewer.removeAllSurfaces === 'function') {
+          viewer.removeAllSurfaces();
+          viewer.setStyle({}, { hidden: true });
 
-      if (compound.pdbId) {
-        if (showProtein) {
-          viewer.addSurface((window as any).$3Dmol.SurfaceType.VDW, { opacity: 0.85, color: '#e7e5e4' }, { hetflag: false });
+          if (compound.pdbId) {
+            if (showProtein) {
+              viewer.addSurface((window as any).$3Dmol.SurfaceType.VDW, { opacity: 0.85, color: '#e7e5e4' }, { hetflag: false });
+            }
+            if (showLigand) {
+              viewer.setStyle({ hetflag: true }, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+            }
+            
+            if (showMisc) {
+              viewer.setStyle({ resn: miscResn }, { sphere: { radius: 0.35, color: 'cyan' } });
+            } else if (showLigand) {
+              viewer.setStyle({ resn: miscResn }, { hidden: true });
+            }
+          } else {
+            if (showLigand) {
+              viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+            }
+          }
+          viewer.render();
         }
-        if (showLigand) {
-          viewer.setStyle({ hetflag: true }, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
-        }
-        
-        if (showMisc) {
-          viewer.setStyle({ resn: miscResn }, { sphere: { radius: 0.35, color: 'cyan' } });
-        } else if (showLigand) {
-          viewer.setStyle({ resn: miscResn }, { hidden: true });
-        }
-      } else {
-        if (showLigand) {
-          viewer.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
-        }
+      } catch (e) {
+        console.warn("Dynamic layout element styling error:", e);
       }
-      viewer.render();
     });
 
   }, [loading, error, showProtein, showLigand, showMisc, compound.pdbId, isVRMode]);
@@ -577,31 +627,41 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
     let active = true;
     const syncViews = () => {
       if (!active) return;
-      const vLeft = viewerInstanceLeft.current;
-      const vRight = viewerInstanceRight.current;
-      
-      if (vLeft && vRight) {
-        const viewL = vLeft.getView();
-        const viewR = vRight.getView();
+      try {
+        const vLeft = viewerInstanceLeft.current;
+        const vRight = viewerInstanceRight.current;
         
-        if (viewL && viewR) {
-          const strL = JSON.stringify(Array.from(viewL));
-          const strR = JSON.stringify(Array.from(viewR));
+        if (vLeft && vRight) {
+          const viewL = typeof vLeft.getView === 'function' ? vLeft.getView() : null;
+          const viewR = typeof vRight.getView === 'function' ? vRight.getView() : null;
           
-          if (strL !== lastSyncView.current) {
-            // Left view was dragged/zoomed; mirror to Right view
-            vRight.setView(viewL);
-            vRight.render();
-            lastSyncView.current = strL;
-          } else if (strR !== lastSyncView.current) {
-            // Right view was dragged/zoomed; mirror to Left view
-            vLeft.setView(viewR);
-            vLeft.render();
-            lastSyncView.current = strR;
+          if (viewL && viewR) {
+            const strL = JSON.stringify(Array.from(viewL));
+            const strR = JSON.stringify(Array.from(viewR));
+            
+            if (strL !== lastSyncView.current) {
+              // Left view was dragged/zoomed; mirror to Right view
+              if (typeof vRight.setView === 'function') {
+                vRight.setView(viewL);
+                vRight.render();
+              }
+              lastSyncView.current = strL;
+            } else if (strR !== lastSyncView.current) {
+              // Right view was dragged/zoomed; mirror to Left view
+              if (typeof vLeft.setView === 'function') {
+                vLeft.setView(viewR);
+                vLeft.render();
+              }
+              lastSyncView.current = strR;
+            }
           }
         }
+      } catch (err) {
+        console.warn("View eye synchronization block error caught:", err);
       }
-      requestAnimationFrame(syncViews);
+      if (active) {
+        requestAnimationFrame(syncViews);
+      }
     };
     
     requestAnimationFrame(syncViews);
@@ -611,54 +671,74 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
   }, [isVRMode, loading, error]);
 
   const handleZoomIn = () => {
-    if (isVRMode) {
-      viewerInstanceLeft.current?.zoom(1.2);
-      viewerInstanceRight.current?.zoom(1.2);
-    } else {
-      viewerInstanceSingle.current?.zoom(1.2);
+    try {
+      if (isVRMode) {
+        viewerInstanceLeft.current?.zoom(1.2);
+        viewerInstanceRight.current?.zoom(1.2);
+      } else {
+        viewerInstanceSingle.current?.zoom(1.2);
+      }
+    } catch (e) {
+      console.warn("Error scaling zoom in:", e);
     }
   };
   const handleZoomOut = () => {
-    if (isVRMode) {
-      viewerInstanceLeft.current?.zoom(0.8);
-      viewerInstanceRight.current?.zoom(0.8);
-    } else {
-      viewerInstanceSingle.current?.zoom(0.8);
+    try {
+      if (isVRMode) {
+        viewerInstanceLeft.current?.zoom(0.8);
+        viewerInstanceRight.current?.zoom(0.8);
+      } else {
+        viewerInstanceSingle.current?.zoom(0.8);
+      }
+    } catch (e) {
+      console.warn("Error scaling zoom out:", e);
     }
   };
   const handleRecenter = () => {
-    if (isVRMode) {
-      viewerInstanceLeft.current?.zoomTo();
-      viewerInstanceRight.current?.zoomTo();
-    } else {
-      viewerInstanceSingle.current?.zoomTo();
+    try {
+      if (isVRMode) {
+        viewerInstanceLeft.current?.zoomTo();
+        viewerInstanceRight.current?.zoomTo();
+      } else {
+        viewerInstanceSingle.current?.zoomTo();
+      }
+    } catch (e) {
+      console.warn("Error centering view:", e);
     }
   };
   const toggleSpin = () => {
-    const nextState = !isSpinning;
-    setIsSpinning(nextState);
-    
-    if (isVRMode) {
-      if (viewerInstanceLeft.current) {
-        if (nextState) viewerInstanceLeft.current.spin("y", 1);
-        else viewerInstanceLeft.current.spin(false);
+    try {
+      const nextState = !isSpinning;
+      setIsSpinning(nextState);
+      
+      if (isVRMode) {
+        if (viewerInstanceLeft.current) {
+          if (nextState) viewerInstanceLeft.current.spin("y", 1);
+          else viewerInstanceLeft.current.spin(false);
+        }
+        if (viewerInstanceRight.current) {
+          if (nextState) viewerInstanceRight.current.spin("y", 1);
+          else viewerInstanceRight.current.spin(false);
+        }
+      } else {
+        if (viewerInstanceSingle.current) {
+          if (nextState) viewerInstanceSingle.current.spin("y", 1);
+          else viewerInstanceSingle.current.spin(false);
+        }
       }
-      if (viewerInstanceRight.current) {
-        if (nextState) viewerInstanceRight.current.spin("y", 1);
-        else viewerInstanceRight.current.spin(false);
-      }
-    } else {
-      if (viewerInstanceSingle.current) {
-        if (nextState) viewerInstanceSingle.current.spin("y", 1);
-        else viewerInstanceSingle.current.spin(false);
-      }
+    } catch (e) {
+      console.warn("Error toggling spin orbit:", e);
     }
   };
   
   // Intercept browser back button when simulated fullscreen is open
   useEffect(() => {
     if (isSimulatedFullscreen) {
-      window.history.pushState({ simulatedFullscreen: true }, "");
+      try {
+        window.history.pushState({ simulatedFullscreen: true }, "");
+      } catch (e) {
+        console.warn("Browser pushState history blocked inside iframe:", e);
+      }
       
       const handlePopState = () => {
         setIsSimulatedFullscreen(false);
@@ -672,10 +752,135 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
     }
   }, [isSimulatedFullscreen]);
 
+  // Handle native orientation and full screen APIs on simulated fullscreen changes
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const container = containerRef.current;
+    if (isSimulatedFullscreen) {
+      // 1. Attempt native full screen
+      try {
+        if (container) {
+          if (container.requestFullscreen) {
+            container.requestFullscreen().catch((err) => {
+              console.log("Native fullscreen blocked or failed, using simulated fallback:", err);
+            });
+          } else if ((container as any).webkitRequestFullscreen) {
+            (container as any).webkitRequestFullscreen();
+          } else if ((container as any).mozRequestFullScreen) {
+            (container as any).mozRequestFullScreen();
+          } else if ((container as any).msRequestFullscreen) {
+            (container as any).msRequestFullscreen();
+          }
+        }
+      } catch (err) {
+        console.warn("Error requesting native fullscreen:", err);
+      }
+
+      // 2. Attempt screen orientation lock to landscape
+      try {
+        if (screen.orientation && (screen.orientation as any).lock) {
+          (screen.orientation as any).lock("landscape").catch((err: any) => {
+            console.log("Orientation lock failed/ignored (acceptable fallback active):", err);
+          });
+        } else if ((screen as any).lockOrientation) {
+          (screen as any).lockOrientation("landscape");
+        }
+      } catch (err) {
+        console.warn("Error locking screen orientation:", err);
+      }
+    } else {
+      // Exit native fullscreen if active
+      try {
+        const isNativeFull = !!(
+          document.fullscreenElement || 
+          (document as any).webkitFullscreenElement || 
+          (document as any).mozFullScreenElement || 
+          (document as any).msFullscreenElement
+        );
+        if (isNativeFull) {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          } else if ((document as any).webkitExitFullscreen) {
+            (document as any).webkitExitFullscreen();
+          } else if ((document as any).mozCancelFullScreen) {
+            (document as any).mozCancelFullScreen();
+          } else if ((document as any).msExitFullscreen) {
+            (document as any).msExitFullscreen();
+          }
+        }
+      } catch (err) {
+        console.warn("Error exiting native fullscreen:", err);
+      }
+
+      // Unlock orientation
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        } else if ((screen as any).unlockOrientation) {
+          (screen as any).unlockOrientation();
+        }
+      } catch (err) {
+        console.warn("Error unlocking screen orientation:", err);
+      }
+    }
+  }, [isSimulatedFullscreen, isMobile]);
+
+  // Sync state if native fullscreen is exited by alternative user action (e.g. escape key or swipe)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isNativeFull = !!(
+        document.fullscreenElement || 
+        (document as any).webkitFullscreenElement || 
+        (document as any).mozFullScreenElement || 
+        (document as any).msFullscreenElement
+      );
+      // If we are showing simulated fullscreen but native fullscreen was exited, go back
+      if (!isNativeFull && isSimulatedFullscreen) {
+        setIsSimulatedFullscreen(false);
+        try {
+          if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+          }
+        } catch (e) {}
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+    };
+  }, [isSimulatedFullscreen]);
+
+  // Lock scroll bar on body during simulated fullscreen
+  useEffect(() => {
+    if (isSimulatedFullscreen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [isSimulatedFullscreen]);
+
   const exitFullscreen = () => {
     setIsSimulatedFullscreen(false);
-    if (window.history.state?.simulatedFullscreen) {
-      window.history.back();
+    try {
+      if (window.history && window.history.state && window.history.state.simulatedFullscreen) {
+        window.history.back();
+      }
+    } catch (e) {
+      console.warn("Failed back navigation execution:", e);
     }
   };
   
@@ -688,7 +893,17 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
   };
 
   return (
-    <div className={`flex-1 relative w-full h-full bg-stone-900 overflow-hidden group transition-all duration-300 ${isSimulatedFullscreen ? 'fixed inset-0 z-[100] bg-stone-950 p-0 m-0 w-screen h-screen' : ''}`}>
+    <div 
+      ref={containerRef} 
+      className={`flex-1 relative w-full h-full bg-stone-900 overflow-hidden group transition-all duration-300 ${
+        isSimulatedFullscreen 
+          ? 'fixed z-[100] bg-stone-950 p-0 m-0 ' + 
+            (isMobile 
+              ? 'portrait:fixed portrait:top-1/2 portrait:left-1/2 portrait:w-[100vh] portrait:h-[100vw] portrait:-translate-x-1/2 portrait:-translate-y-1/2 portrait:rotate-90 portrait:origin-center landscape:fixed landscape:inset-0 landscape:w-screen landscape:h-screen w-screen h-screen'
+              : 'fixed inset-0 w-screen h-screen')
+          : ''
+      }`}
+    >
       {isSimulatedFullscreen && (
         <button 
           onClick={exitFullscreen}
@@ -1462,10 +1677,16 @@ export function DetailsPanel({
   const { language } = useLanguage();
   const t = translations[language];
 
+
+
   // Intercept browser back button on mobile when 3D modal is open
   useEffect(() => {
     if (is3DModalOpen) {
-      window.history.pushState({ modal3dOpen: true }, "");
+      try {
+        window.history.pushState({ modal3dOpen: true }, "");
+      } catch (e) {
+        console.warn("Browser pushState history blocked inside iframe:", e);
+      }
       
       const handlePopState = () => {
         setIs3DModalOpen(false);
@@ -1482,8 +1703,12 @@ export function DetailsPanel({
   const close3DModal = () => {
     setIs3DModalOpen(false);
     setShowVRInfo(false);
-    if (window.history.state?.modal3dOpen) {
-      window.history.back();
+    try {
+      if (window.history && window.history.state && window.history.state.modal3dOpen) {
+        window.history.back();
+      }
+    } catch (e) {
+      console.warn("Failed back navigation execution:", e);
     }
   };
 
@@ -1913,6 +2138,9 @@ export function DetailsPanel({
 
             <div className="mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 dark:text-stone-100 mb-2 sm:mb-3">{translateDb(part.name, language)}</h2>
+              <div className="mb-4">
+                <TextToSpeech text={translateDb(part.description, language)} language={language === 'ms' ? 'ms' : 'en'} />
+              </div>
               <p className="text-stone-600 dark:text-stone-400 leading-relaxed text-base sm:text-lg">{translateDb(part.description, language)}</p>
             </div>
 
@@ -1994,6 +2222,11 @@ export function DetailsPanel({
                   ))}
                 </div>
               )}
+
+              {/* Text-To-Speech (TTS) Accessibility Control Panel */}
+              <div className="mb-6">
+                <TextToSpeech text={translateDb(plant.description, language)} language={language === 'ms' ? 'ms' : 'en'} />
+              </div>
               
               <div className="prose prose-stone dark:prose-invert">
                 <p className="text-stone-600 dark:text-stone-300 leading-relaxed text-base sm:text-lg">
