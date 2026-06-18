@@ -746,7 +746,7 @@ export const plantsData: Plant[] = [
             pdbId: "3A23",
             pharmacologicalActivity: "Emulsifier, suspending agent, binder, demulcent.",
             therapeuticActivity: "Pharmaceutical excipient for stabilization.",
-            structure2DPlaceholder: "https://picsum.photos/seed/arabin2d/300/200",
+            structure2DPlaceholder: "/arabic-acid-2d.svg",
             structure3DPlaceholder: "Interactive 3D view",
             pharmaceuticalAnalysis: {
               molecularWeight: "Highly variable",

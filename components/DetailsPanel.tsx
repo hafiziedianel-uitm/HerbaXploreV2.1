@@ -3,6 +3,7 @@
 import { Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle, ZoomIn, ZoomOut, RotateCcw, Crosshair } from "lucide-react";
+import { fetchWithCache } from "@/lib/offlineCache";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { MassSpectrumChart, NMRSpectrumChart, NMRDataTable, CNMRSpectrumChart, CNMRDataTable } from "./SpectrumCharts";
@@ -367,7 +368,39 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
   const [showLigand, setShowLigand] = useState(true);
   const [showMisc, setShowMisc] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [isSimulatedFullscreen, setIsSimulatedFullscreen] = useState(false);
   const lastSyncView = useRef<string>("");
+
+  // Resize when fullscreen toggles or browser window resizes
+  useEffect(() => {
+    const viewers = [
+      viewerInstanceSingle.current,
+      viewerInstanceLeft.current,
+      viewerInstanceRight.current
+    ].filter(Boolean);
+    
+    if (viewers.length > 0) {
+      const triggerResize = () => {
+        viewers.forEach(v => {
+          v.resize();
+          v.render();
+        });
+      };
+      // Trigger multiple ticks to ensure layout completes
+      triggerResize();
+      const t1 = setTimeout(triggerResize, 60);
+      const t2 = setTimeout(triggerResize, 150);
+      const t3 = setTimeout(triggerResize, 350);
+
+      window.addEventListener('resize', triggerResize);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+        window.removeEventListener('resize', triggerResize);
+      };
+    }
+  }, [isSimulatedFullscreen, isVRMode, loading]);
 
   useEffect(() => {
     // Reset states on compound change or VR mode change
@@ -385,15 +418,15 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
         let sdfData = "";
         const isPdb = !!compound.pdbId;
         
-        // Fetch model data once
+        // Fetch model data once using our offline fetchWithCache helper
         if (isPdb) {
-          const response = await fetch(`https://files.rcsb.org/download/${compound.pdbId}.pdb`);
+          const response = await fetchWithCache(`https://files.rcsb.org/download/${compound.pdbId}.pdb`);
           if (!response.ok) {
             throw new Error('Failed to fetch PDB structure');
           }
           pdbData = await response.text();
         } else {
-          const response = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=3d`);
+          const response = await fetchWithCache(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=3d`);
           if (!response.ok) {
             throw new Error('Failed to fetch 3D structure');
           }
@@ -622,22 +655,49 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
     }
   };
   
+  // Intercept browser back button when simulated fullscreen is open
+  useEffect(() => {
+    if (isSimulatedFullscreen) {
+      window.history.pushState({ simulatedFullscreen: true }, "");
+      
+      const handlePopState = () => {
+        setIsSimulatedFullscreen(false);
+      };
+
+      window.addEventListener("popstate", handlePopState);
+
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+      };
+    }
+  }, [isSimulatedFullscreen]);
+
+  const exitFullscreen = () => {
+    setIsSimulatedFullscreen(false);
+    if (window.history.state?.simulatedFullscreen) {
+      window.history.back();
+    }
+  };
+  
   const toggleFullscreen = () => {
-    const elem = isVRMode 
-      ? viewerRefLeft.current?.parentElement?.parentElement 
-      : viewerRefSingle.current?.parentElement;
-    if (!elem) return;
-    if (!document.fullscreenElement) {
-      elem.requestFullscreen().catch((err: any) => {
-        console.log(`Error attempting to enable fullscreen: ${err.message}`);
-      });
+    if (isSimulatedFullscreen) {
+      exitFullscreen();
     } else {
-      document.exitFullscreen();
+      setIsSimulatedFullscreen(true);
     }
   };
 
   return (
-    <div className="flex-1 relative w-full h-full bg-stone-900 overflow-hidden group">
+    <div className={`flex-1 relative w-full h-full bg-stone-900 overflow-hidden group transition-all duration-300 ${isSimulatedFullscreen ? 'fixed inset-0 z-[100] bg-stone-950 p-0 m-0 w-screen h-screen' : ''}`}>
+      {isSimulatedFullscreen && (
+        <button 
+          onClick={exitFullscreen}
+          className="absolute top-4 left-4 z-40 flex items-center gap-1.5 bg-stone-900/95 hover:bg-stone-850 text-stone-100 px-3 py-2 rounded-xl border border-stone-800 font-bold text-xs transition active:scale-95 shadow-lg shadow-black/55"
+        >
+          <ArrowLeft size={16} />
+          <span>{language === 'ms' ? 'Kembali' : 'Back'}</span>
+        </button>
+      )}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-stone-900/80 backdrop-blur-sm">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
@@ -719,10 +779,10 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
           <div className="w-px h-6 bg-stone-700 mx-1"></div>
           <button 
             onClick={toggleFullscreen}
-            className="p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent"
-            title="Fullscreen"
+            className="p-1.5 xs:p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent shrink-0"
+            title={isSimulatedFullscreen ? (language === 'ms' ? 'Keluar Skrin Penuh' : 'Exit Fullscreen') : (language === 'ms' ? 'Skrin Penuh' : 'Fullscreen')}
           >
-            <Maximize2 size={18} />
+            {isSimulatedFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
           </button>
         </div>
       )}
@@ -771,6 +831,8 @@ function Structure2DImage({ compound, onEnlarge }: { compound: Compound; onEnlar
   const t = translations[language];
   const primaryUrl = compound.id === "sterculia-polysaccharide"
     ? "/sterculia-polysaccharide-2d.svg"
+    : compound.id === "arabin"
+    ? "/arabic-acid-2d.svg"
     : `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/PNG`;
   const fallbackUrl = compound.structure2DPlaceholder;
   const currentUrl = error ? fallbackUrl : primaryUrl;
@@ -827,9 +889,9 @@ function NpraSearchSection({ plant }: { plant: Plant }) {
     setLoading(true);
     setError(null);
     try {
-      let res = await fetch(`/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
+      let res = await fetchWithCache(`/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
       if (res.status === 404) {
-        res = await fetch(`/app/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
+        res = await fetchWithCache(`/app/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
       }
       if (!res.ok) {
         throw new Error("Unable to contact Quest 3+ database proxy");
@@ -1246,7 +1308,7 @@ function PublicationsSection({ plantName, compoundName }: { plantName: string; c
 
     async function fetchPublications() {
       try {
-        const response = await fetch(`/api/publications?plant=${encodeURIComponent(plantName)}&compound=${encodeURIComponent(compoundName)}`);
+        const response = await fetchWithCache(`/api/publications?plant=${encodeURIComponent(plantName)}&compound=${encodeURIComponent(compoundName)}`);
         if (!response.ok) {
           throw new Error("Failed to load publication records");
         }
@@ -1399,6 +1461,31 @@ export function DetailsPanel({
   const [activeSpectrumTab, setActiveSpectrumTab] = useState<'1H' | '13C'>('1H');
   const { language } = useLanguage();
   const t = translations[language];
+
+  // Intercept browser back button on mobile when 3D modal is open
+  useEffect(() => {
+    if (is3DModalOpen) {
+      window.history.pushState({ modal3dOpen: true }, "");
+      
+      const handlePopState = () => {
+        setIs3DModalOpen(false);
+      };
+
+      window.addEventListener("popstate", handlePopState);
+
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+      };
+    }
+  }, [is3DModalOpen]);
+
+  const close3DModal = () => {
+    setIs3DModalOpen(false);
+    setShowVRInfo(false);
+    if (window.history.state?.modal3dOpen) {
+      window.history.back();
+    }
+  };
 
   const filteredCompounds = part?.compounds.filter(comp => 
     comp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -2092,52 +2179,58 @@ export function DetailsPanel({
               className="bg-stone-900 w-full max-w-6xl h-full max-h-[800px] rounded-3xl shadow-2xl border border-stone-700 flex flex-col overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-stone-800 flex items-center justify-between bg-stone-900/50">
-                <div className="flex items-center gap-3">
-                  <div className="bg-stone-800 p-2 rounded-lg text-stone-300">
+              <div className="px-3 py-2.5 sm:px-6 sm:py-4 border-b border-stone-800 flex items-center justify-between bg-stone-900/50">
+                <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                  <button 
+                    onClick={close3DModal}
+                    className="flex items-center gap-1 bg-stone-850 hover:bg-stone-800 text-stone-200 px-2.5 py-1.5 rounded-xl border border-stone-800 font-bold text-xs transition active:scale-95 shrink-0"
+                  >
+                    <ArrowLeft size={14} className="sm:w-4 sm:h-4" />
+                    <span className="hidden xs:inline">{language === 'ms' ? 'Kembali' : 'Back'}</span>
+                  </button>
+                  <div className="hidden md:flex bg-stone-800 p-2 rounded-lg text-stone-300 shrink-0">
                     <Dna size={20} />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">
-                      {translateDb(compound.name, language)} - {language === 'ms' ? 'Struktur Pengikatan 3D' : '3D Binding Interaction'}
+                  <div className="min-w-0 flex-1 sm:flex-initial">
+                    <h3 className="text-xs sm:text-lg font-bold text-white truncate max-w-[90px] xs:max-w-[130px] sm:max-w-[200px] md:max-w-none">
+                      {translateDb(compound.name, language)}
                     </h3>
-                    <p className="text-xs text-stone-400">
-                      {language === 'ms' ? 'Pemapar Molekul Interaktif' : 'Interactive Molecular Viewer'}
+                    <p className="text-[9px] sm:text-xs text-stone-400 truncate hidden xs:block">
+                      {language === 'ms' ? 'Pemapar Molekul 3D' : '3D Molecular Viewer'}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                   <button 
                     onClick={() => setShowVRInfo(!showVRInfo)}
-                    className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors border ${
+                    className={`p-1.5 sm:p-2 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors border shrink-0 ${
                       showVRInfo 
                         ? 'bg-amber-600/20 text-amber-400 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]' 
-                        : 'bg-stone-800 text-stone-400 border-stone-700 hover:bg-stone-700 hover:text-stone-300'
+                        : 'bg-stone-850 text-stone-400 border-stone-800 hover:bg-stone-800 hover:text-stone-300'
                     }`}
                     title="VR Requirements & Guidelines"
                   >
-                    <HelpCircle size={18} />
-                    <span className="hidden md:inline">{language === 'ms' ? 'Panduan VR' : 'VR Guide'}</span>
+                    <HelpCircle size={15} className="sm:w-[18px] sm:h-[18px]" />
+                    <span className="hidden lg:inline">{language === 'ms' ? 'Panduan VR' : 'VR Guide'}</span>
                   </button>
                   <button 
                     onClick={() => setIsVRMode(!isVRMode)}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border ${
+                    className={`px-2 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors border shrink-0 ${
                       isVRMode 
-                        ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
-                        : 'bg-stone-800 text-stone-400 border-stone-700 hover:bg-stone-700 hover:text-stone-300'
+                        ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.25)]' 
+                        : 'bg-stone-850 text-stone-450 border-stone-800 hover:bg-stone-800 hover:text-stone-200'
                     }`}
                   >
-                    <Headset size={18} />
-                    {isVRMode ? 'VR Mode: ON' : 'VR Mode: OFF'}
+                    <Headset size={15} className="sm:w-[18px] sm:h-[18px]" />
+                    <span className="hidden sm:inline">{isVRMode ? 'VR Mode: ON' : 'VR Mode: OFF'}</span>
+                    <span className="sm:hidden">{isVRMode ? 'VR: ON' : 'VR: OFF'}</span>
                   </button>
                   <button 
-                    onClick={() => {
-                      setIs3DModalOpen(false);
-                      setShowVRInfo(false);
-                    }}
-                    className="text-stone-400 hover:text-white bg-stone-800 hover:bg-stone-700 p-2 rounded-full transition-colors"
+                    onClick={close3DModal}
+                    className="text-stone-400 hover:text-white bg-stone-850 hover:bg-stone-800 p-1.5 rounded-full transition-colors hidden sm:block shrink-0"
+                    aria-label="Close"
                   >
-                    <X size={20} />
+                    <X size={18} />
                   </button>
                 </div>
               </div>

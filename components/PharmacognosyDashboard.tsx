@@ -5,11 +5,21 @@ import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
 import { DetailsPanel } from "./DetailsPanel";
-import { Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, SlidersHorizontal, Filter, RotateCcw, Home, Languages, AlertCircle, ShieldCheck } from "lucide-react";
+import { 
+  Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, 
+  SlidersHorizontal, Filter, RotateCcw, Home, Languages, AlertCircle, ShieldCheck,
+  Wifi, WifiOff, RefreshCw, Trash2, Database, CheckCircle, DownloadCloud, Globe 
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLanguage } from "@/lib/LanguageContext";
 import { translations, translateDb } from "@/lib/i18n";
+import { 
+  cachePlantMetadata, 
+  precacheAllAssets, 
+  getOfflineStats, 
+  clearOfflineCaches 
+} from "@/lib/offlineCache";
 
 const BIOACTIVE_OPTIONS = [
   "Flavonoid",
@@ -66,13 +76,98 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showDisclaimer, setShowDisclaimer] = useState<boolean>(true);
 
+  // Offline Sync and Network Status States
+  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncProgress, setSyncProgress] = useState<number>(0);
+  const [syncStatus, setSyncStatus] = useState<string>("");
+  const [cacheStats, setCacheStats] = useState<{
+    pdbInCache: string[];
+    sdfInCache: string[];
+    apisInCache: string[];
+    totalCached: number;
+  }>({
+    pdbInCache: [],
+    sdfInCache: [],
+    apisInCache: [],
+    totalCached: 0
+  });
+
   useEffect(() => {
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
     const accepted = localStorage.getItem("herbaXplorerDisclaimerAccepted");
     if (accepted === "true") {
       setShowDisclaimer(false); // eslint-disable-line react-hooks/set-state-in-effect
     }
+
+    // Cache plant metadata on load for true offline redundancy
+    cachePlantMetadata(plantsData);
+
+    // Register Progressive Web App (PWA) Service Worker
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          console.log("[PWA] Service Worker registered scope:", reg.scope);
+        })
+        .catch((err) => {
+          console.warn("[PWA] Service Worker registration failed:", err);
+        });
+    }
+
+    if (typeof window !== "undefined") {
+      setIsOnline(window.navigator.onLine);
+
+      const handleOnline = () => setIsOnline(true);
+      const handleOffline = () => setIsOnline(false);
+
+      window.addEventListener("online", handleOnline);
+      window.addEventListener("offline", handleOffline);
+
+      // Load initial offline assets data
+      getOfflineStats().then((stats) => setCacheStats(stats));
+
+      return () => {
+        window.removeEventListener("online", handleOnline);
+        window.removeEventListener("offline", handleOffline);
+      };
+    }
   }, []);
+
+  const handleSyncAll = async () => {
+    setIsSyncing(true);
+    setSyncProgress(0);
+    setSyncStatus(language === "ms" ? "Memulakan penyelarasan luar talian..." : "Starting offline sync...");
+    
+    try {
+      await precacheAllAssets((prog, name) => {
+        setSyncProgress(prog);
+        setSyncStatus(name);
+      });
+      const updatedStats = await getOfflineStats();
+      setCacheStats(updatedStats);
+    } catch (err) {
+      console.error("Sync failed:", err);
+      setSyncStatus(language === "ms" ? "Ralat penyelarasan!" : "Sync encountered an error!");
+    } finally {
+      setTimeout(() => {
+        setIsSyncing(false);
+        setSyncStatus("");
+        setSyncProgress(0);
+      }, 1500);
+    }
+  };
+
+  const handleClearCache = async () => {
+    const confirmMsg = language === "ms" 
+      ? "Padam semua data model 3D yang disimpan luar talian?" 
+      : "Clear all downloaded 3D structure data from offline cache?";
+    if (window.confirm(confirmMsg)) {
+      await clearOfflineCaches();
+      const updatedStats = await getOfflineStats();
+      setCacheStats(updatedStats);
+    }
+  };
 
   const handleAcceptDisclaimer = () => {
     localStorage.setItem("herbaXplorerDisclaimerAccepted", "true");
@@ -565,6 +660,66 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                     );
                   })}
                 </AnimatePresence>
+              )}
+            </div>
+
+            {/* Offline Synchronization Controller Card */}
+            <div className="p-3.5 bg-stone-50 dark:bg-stone-900/40 border-t border-stone-200/50 dark:border-stone-850 flex flex-col gap-2 shrink-0 select-none">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className={`w-2 h-2 rounded-full ring-4 shrink-0 ${isOnline ? 'bg-emerald-500 ring-emerald-500/10' : 'bg-amber-500 ring-amber-500/15'}`} />
+                  <p className="text-[11px] font-bold text-stone-700 dark:text-stone-300 truncate">
+                    {isOnline 
+                      ? (language === 'ms' ? 'Mod Atas Talian' : 'Online Mode') 
+                      : (language === 'ms' ? 'Mod Luar Talian' : 'Offline Mode')}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 bg-stone-200/50 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-2 py-0.5 rounded-md text-[9px] font-mono leading-none font-bold">
+                  <Database size={10} />
+                  <span>{cacheStats.totalCached} {language === 'ms' ? 'fail' : 'files'}</span>
+                </div>
+              </div>
+
+              {isSyncing ? (
+                <div className="bg-stone-100 dark:bg-stone-950 p-2 rounded-xl border border-stone-205 dark:border-stone-850 animate-pulse">
+                  <div className="flex items-center justify-between text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400 mb-1 font-mono">
+                    <span className="truncate max-w-[130px]">{syncStatus}</span>
+                    <span className="shrink-0">{syncProgress}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-stone-200 dark:bg-stone-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-emerald-500 dark:bg-emerald-400 transition-all duration-150 ease-out" 
+                      style={{ width: `${syncProgress}%` }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  <div className="text-[10px] text-stone-500 dark:text-stone-400 leading-normal font-medium">
+                    {cacheStats.totalCached > 0 
+                      ? (language === 'ms' ? '✓ Model 3D sedia untuk kegunaan pengajian luar talian.' : '✓ 3D models available for offline visual reference.')
+                      : (language === 'ms' ? 'Penyelarasan membolehkan semua struktur 3D diakses tanpa internet.' : 'Sync 3D models to study structures anytime without active internet.')}
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={handleSyncAll}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 dark:border dark:border-emerald-500/20 py-1.5 px-2 rounded-lg text-[10px] font-extrabold flex items-center justify-center gap-1.5 transition active:scale-[0.98]"
+                      title="Sync all plant 3D molecular structures for offline access"
+                    >
+                      <DownloadCloud size={12} className="shrink-0 animate-bounce" />
+                      <span>{language === 'ms' ? 'Muat Turun Semua' : 'Sync All Assets'}</span>
+                    </button>
+                    {cacheStats.totalCached > 0 && (
+                      <button
+                        onClick={handleClearCache}
+                        className="bg-stone-200/50 hover:bg-stone-200 hover:text-red-600 dark:bg-stone-800 dark:hover:bg-red-950/30 dark:hover:text-red-400 p-1.5 rounded-lg text-stone-500 dark:text-stone-400 transition"
+                        title="Delete cached offline databases to free space"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           </div>

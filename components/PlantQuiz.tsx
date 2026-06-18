@@ -2,8 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { Plant, PlantPart, getCompoundBioactiveClass } from '@/lib/data';
 import { useLanguage } from '@/lib/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, XCircle, Award, RefreshCcw, ArrowRight, HelpCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Award, RefreshCcw, ArrowRight, HelpCircle, FileText } from 'lucide-react';
 import { translateDb } from '@/lib/i18n';
+import { compileDualLanguageDocument } from '@/lib/quizExporter';
 
 interface PlantQuizProps {
   plant: Plant;
@@ -234,13 +235,37 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
     setQuizComplete(false);
   };
 
+  const handleDownloadQACompilation = () => {
+    const docText = compileDualLanguageDocument();
+    const blob = new Blob([docText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'HerbaXplorer_Complete_QA_Verification_Database.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm mt-8">
-      <div className="flex items-center gap-2 text-stone-800 dark:text-stone-100 font-bold mb-6 pb-4 border-b border-stone-100 dark:border-stone-800">
-        <div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-xl text-indigo-600 dark:text-indigo-400">
-          <HelpCircle size={20} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center gap-2 text-stone-800 dark:text-stone-100 font-bold">
+          <div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-xl text-indigo-600 dark:text-indigo-400">
+            <HelpCircle size={20} />
+          </div>
+          <h3 className="text-xl">{language === 'en' ? 'Knowledge Check' : 'Ujian Pengetahuan'}</h3>
         </div>
-        <h3 className="text-xl">{language === 'en' ? 'Knowledge Check' : 'Ujian Pengetahuan'}</h3>
+        <button
+          type="button"
+          onClick={handleDownloadQACompilation}
+          className="flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-950/70 border border-indigo-200/40 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-xl text-xs font-bold transition duration-150 shadow-sm active:scale-95"
+          title={language === 'en' ? 'Download Full Q&A Database' : 'Muat Turun Pangkalan Data Soal Jawab Lengkap'}
+        >
+          <FileText size={14} />
+          <span>{language === 'en' ? 'Download Q&A Database' : 'Muat Turun Soal Jawab'}</span>
+        </button>
       </div>
 
       <AnimatePresence mode="wait">

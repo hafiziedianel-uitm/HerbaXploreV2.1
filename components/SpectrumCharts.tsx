@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { fetchWithCache } from '@/lib/offlineCache';
 import {
   BarChart,
   Bar,
@@ -82,7 +83,7 @@ function useCompoundSpectra(compoundName: string) {
 
     async function fetchData() {
       try {
-        const response = await fetch(`/api/nmrshiftdb?compound=${encodeURIComponent(compoundName)}`);
+        const response = await fetchWithCache(`/api/nmrshiftdb?compound=${encodeURIComponent(compoundName)}`);
         if (!response.ok) {
           throw new Error(`Endpoint returned status ${response.status}`);
         }
