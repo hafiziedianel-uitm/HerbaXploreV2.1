@@ -353,7 +353,17 @@ function FunctionalGroupDiagram({ name }: { name: string }) {
   );
 }
 
-function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compound, isVRMode: boolean, isMobile?: boolean }) {
+function Interactive3DViewer({ 
+  compound, 
+  isVRMode, 
+  isMobile,
+  onToggleVRMode
+}: { 
+  compound: Compound; 
+  isVRMode: boolean; 
+  isMobile?: boolean; 
+  onToggleVRMode?: () => void;
+}) {
   const { language } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRefSingle = useRef<HTMLDivElement>(null);
@@ -992,6 +1002,15 @@ function Interactive3DViewer({ compound, isVRMode, isMobile }: { compound: Compo
             <ZoomIn size={18} />
           </button>
           <div className="w-px h-6 bg-stone-700 mx-1"></div>
+          {onToggleVRMode && (
+            <button 
+              onClick={onToggleVRMode}
+              className={`p-2.5 rounded-xl transition-all ${isVRMode ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.25)]' : 'text-stone-300 hover:bg-stone-800 border border-transparent'}`}
+              title={isVRMode ? 'VR Mode: ON' : 'VR Mode: OFF'}
+            >
+              <Headset size={18} />
+            </button>
+          )}
           <button 
             onClick={toggleFullscreen}
             className="p-1.5 xs:p-2.5 rounded-xl text-stone-300 hover:bg-stone-800 hover:text-white transition-all border border-transparent shrink-0"
@@ -2470,7 +2489,12 @@ export function DetailsPanel({
               
               {/* Modal Body */}
               <div className="flex-1 relative flex overflow-hidden">
-                <Interactive3DViewer compound={compound} isVRMode={isVRMode} isMobile={isMobile} />
+                <Interactive3DViewer 
+                  compound={compound} 
+                  isVRMode={isVRMode} 
+                  isMobile={isMobile} 
+                  onToggleVRMode={() => setIsVRMode(!isVRMode)} 
+                />
                 
                 <AnimatePresence>
                   {showVRInfo && (
