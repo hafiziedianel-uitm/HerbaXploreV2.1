@@ -43,9 +43,14 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
     // 1. Question about plant parts
     const partNames = plant.parts.map(p => translateDb(p.name, language));
     if (plant.parts.length > 0) {
+      const isJavaTea = plant.id === 'misai-kucing';
+      const rootOption = isJavaTea 
+        ? (en ? 'Root' : 'Akar') 
+        : (en ? 'Root Bark' : 'Kulit Akar');
+
       const options = sorter([
         partNames[0],
-        en ? 'Root Bark' : 'Kulit Akar',
+        rootOption,
         en ? 'Wood Core' : 'Teras Kayu',
         en ? 'Pollen' : 'Debunga'
       ]);
@@ -53,7 +58,7 @@ export function PlantQuiz({ plant }: PlantQuizProps) {
       q.push({
         id: 'q1',
         type: 'multiple-choice',
-        question: en ? `Which part of ${translateDb(plant.name, language)} is predominantly used in traditional medicine or extraction?` : `Bahagian manakah pada ${translateDb(plant.name, language)} yang paling banyak digunakan dalam perubatan tradisional atau pengekstrakan?`,
+        question: en ? `Which part of ${translateDb(plant.name, language)} is predominantly used in traditional medicine?` : `Bahagian manakah pada ${translateDb(plant.name, language)} yang paling banyak digunakan dalam perubatan tradisional?`,
         options: options,
         correctAnswer: options.indexOf(partNames[0]),
         explanation: en ? `The ${partNames[0]} is a primary source of therapeutic compounds.` : `${partNames[0]} adalah sumber utama sebatian terapeutik.`

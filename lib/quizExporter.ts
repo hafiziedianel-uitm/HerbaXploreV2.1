@@ -55,9 +55,14 @@ export function compileAllQuizQuestions(lang: 'en' | 'ms'): string {
     // 1. Question about plant parts
     const partNames = plant.parts.map(p => translateDb(p.name, lang));
     if (plant.parts.length > 0) {
+      const isJavaTea = plant.id === 'misai-kucing';
+      const rootOption = isJavaTea 
+        ? (isEn ? 'Root' : 'Akar') 
+        : (isEn ? 'Root Bark' : 'Kulit Akar');
+
       const partOptions = getDeterministicOptions(plant.id, [
         partNames[0],
-        isEn ? 'Root Bark' : 'Kulit Akar',
+        rootOption,
         isEn ? 'Wood Core' : 'Teras Kayu',
         isEn ? 'Pollen' : 'Debunga'
       ]);
@@ -65,7 +70,7 @@ export function compileAllQuizQuestions(lang: 'en' | 'ms'): string {
       const correctAnsIdx = partOptions.indexOf(partNames[0]);
       const correctLetter = String.fromCharCode(65 + correctAnsIdx); // A, B, C, D
 
-      lines.push(`    Q${qCounter}: ${isEn ? `Which part of ${pName} is predominantly used in traditional medicine or extraction?` : `Bahagian manakah pada ${pName} yang paling banyak digunakan dalam perubatan tradisional atau pengekstrakan?`}`);
+      lines.push(`    Q${qCounter}: ${isEn ? `Which part of ${pName} is predominantly used in traditional medicine?` : `Bahagian manakah pada ${pName} yang paling banyak digunakan dalam perubatan tradisional?`}`);
       partOptions.forEach((opt, idx) => {
         lines.push(`       ${String.fromCharCode(65 + idx)}) ${opt}`);
       });

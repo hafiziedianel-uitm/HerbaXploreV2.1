@@ -1335,11 +1335,12 @@ export const plantsData: Plant[] = [
           {
             id: "methyl-salicylate",
             name: "Methyl salicylate",
+            hide3D: true,
             functionalGroups: [
               { name: "Ester", description: "Methyl ester of salicylic acid, giving it high volatility and distinctive minty odor." },
               { name: "Phenolic hydroxyl", description: "Responsible for mild acidity and characteristic reactivity." }
             ],
-            keyFact: "The chief component of wintergreen oil; it provides a heating/cooling counter-irritant effect in topical muscle rubs like Bengay or Tiger Balm.",
+            keyFact: "The chief component of wintergreen oil; it provides a heating/cooling counter-irritant effect in topical muscle rubs like Bengay or Tiger Balm. Note that methyl salicylate is a pro-drug that must be metabolized into active salicylic acid to exert its biological anti-inflammatory and analgesic actions.",
             pharmacologicalActivity: "Anti-inflammatory, analgesic, counter-irritant.",
             therapeuticActivity: "Used topically for muscle and joint pain.",
             structure2DPlaceholder: "https://picsum.photos/seed/methylsalicylate2d/300/200",
