@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { PlantViewer } from "./PlantViewer";
 import { DetailsPanel } from "./DetailsPanel";
+import { PlantComparison } from "./PlantComparison";
 import { 
   Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, 
   SlidersHorizontal, Filter, RotateCcw, Home, Languages, AlertCircle, ShieldCheck,
-  Wifi, WifiOff, RefreshCw, Trash2, Database, CheckCircle, DownloadCloud, Globe 
+  Wifi, WifiOff, RefreshCw, Trash2, Database, CheckCircle, DownloadCloud, Globe,
+  ArrowLeftRight
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -68,6 +70,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(true);
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
   
   // Custom Filters States
   const [selectedBioactive, setSelectedBioactive] = useState<string>("All");
@@ -487,8 +490,28 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
           ${leftSidebarCollapsed ? (isMobile ? '-translate-x-full' : 'w-0') : (isMobile ? 'w-[280px] translate-x-0' : 'w-64')}
         `}>
           <div className={`w-full bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-colors duration-300 h-full overflow-hidden ${leftSidebarCollapsed ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100'}`}>
-            <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
-              <h2 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">{t.plantDatabase}</h2>
+            <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h2 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">{t.plantDatabase}</h2>
+                <button
+                  onClick={() => {
+                    setIsCompareMode(!isCompareMode);
+                    if (!isCompareMode) {
+                      setRightSidebarCollapsed(true);
+                    }
+                  }}
+                  className={`px-2 py-0.5 text-[9px] font-extrabold rounded-full border transition-all flex items-center gap-1 shrink-0 ${
+                    isCompareMode 
+                      ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                      : 'bg-stone-50 dark:bg-stone-850 hover:bg-emerald-500/10 hover:text-emerald-600 border-stone-200 dark:border-stone-800 text-stone-500 dark:text-stone-400'
+                  }`}
+                  title={language === 'ms' ? 'Banding Tumbuhan Bersebelahan' : 'Compare Plants Side-by-Side'}
+                  id="compare-mode-toggle-btn"
+                >
+                  <ArrowLeftRight size={10} />
+                  <span>{language === 'ms' ? 'Banding' : 'Compare'}</span>
+                </button>
+              </div>
               {isMobile && (
                 <button onClick={() => setLeftSidebarCollapsed(true)} className="text-stone-400 hover:text-stone-600">
                   <CloseIcon size={18} />
@@ -736,10 +759,10 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
           )}
         </div>
 
-        {/* Middle Column: Plant Viewer */}
+        {/* Middle Column: Plant Viewer / Comparison View */}
         <div className="flex-1 relative overflow-hidden flex flex-col bg-stone-200/50 dark:bg-stone-950/50 transition-colors duration-300">
           {/* Mobile Menu Toggles */}
-          {isMobile && (
+          {isMobile && !isCompareMode && (
             <button 
               onClick={() => setRightSidebarCollapsed(false)}
               className="absolute top-4 right-4 z-30 pointer-events-auto bg-white/90 dark:bg-stone-900/90 p-2.5 rounded-xl shadow-lg border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-300"
@@ -748,21 +771,29 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
             </button>
           )}
 
-          <PlantViewer 
-            plant={selectedPlant} 
-            selectedPart={selectedPart}
-            onPartClick={handlePartClick} 
-            onPartDoubleClick={handlePartDoubleClick}
-            isMobile={isMobile}
-            onNextPlant={handleNextPlant}
-            onPrevPlant={handlePrevPlant}
-            currentPlantIndex={filteredPlants.findIndex(p => p.id === selectedPlant.id)}
-            totalPlantsCount={filteredPlants.length}
-          />
+          {isCompareMode ? (
+            <PlantComparison 
+              onClose={() => setIsCompareMode(false)}
+              initialLeftPlant={selectedPlant}
+            />
+          ) : (
+            <PlantViewer 
+              plant={selectedPlant} 
+              selectedPart={selectedPart}
+              onPartClick={handlePartClick} 
+              onPartDoubleClick={handlePartDoubleClick}
+              isMobile={isMobile}
+              onNextPlant={handleNextPlant}
+              onPrevPlant={handlePrevPlant}
+              currentPlantIndex={filteredPlants.findIndex(p => p.id === selectedPlant.id)}
+              totalPlantsCount={filteredPlants.length}
+            />
+          )}
         </div>
 
         {/* Right Sidebar Overlay for Mobile */}
-        {isMobile && !rightSidebarCollapsed && (
+        {/* Right Sidebar Overlay for Mobile */}
+        {isMobile && !rightSidebarCollapsed && !isCompareMode && (
           <div 
             className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
             onClick={() => setRightSidebarCollapsed(true)}
@@ -770,52 +801,54 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
         )}
 
         {/* Right Column: Details Panel */}
-        <div className={`
-          ${isMobile ? 'fixed inset-y-0 right-0 z-50' : 'relative'} 
-          flex shrink-0 transition-all duration-300 
-          ${rightSidebarCollapsed ? (isMobile ? 'translate-x-full' : 'w-0') : (isMobile ? 'w-[90%] translate-x-0' : 'w-[400px] xl:w-[480px]')}
-        `}>
-          {/* Right Toggle Button (Desktop only) */}
-          {!isMobile && (
-            <button 
-              onClick={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
-              className={`absolute top-1/2 -translate-y-1/2 z-30 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-full p-1.5 shadow-lg text-stone-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all ${rightSidebarCollapsed ? 'right-2' : 'left-[-14px]'}`}
-              title={rightSidebarCollapsed ? "Expand Details" : "Collapse Details"}
-            >
-              {rightSidebarCollapsed ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-            </button>
-          )}
+        {!isCompareMode && (
+          <div className={`
+            ${isMobile ? 'fixed inset-y-0 right-0 z-50' : 'relative'} 
+            flex shrink-0 transition-all duration-300 
+            ${rightSidebarCollapsed ? (isMobile ? 'translate-x-full' : 'w-0') : (isMobile ? 'w-[90%] translate-x-0' : 'w-[400px] xl:w-[480px]')}
+          `}>
+            {/* Right Toggle Button (Desktop only) */}
+            {!isMobile && (
+              <button 
+                onClick={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+                className={`absolute top-1/2 -translate-y-1/2 z-30 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-full p-1.5 shadow-lg text-stone-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all ${rightSidebarCollapsed ? 'right-2' : 'left-[-14px]'}`}
+                title={rightSidebarCollapsed ? "Expand Details" : "Collapse Details"}
+              >
+                {rightSidebarCollapsed ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+              </button>
+            )}
 
-          <div className={`w-full bg-white dark:bg-stone-900 border-l border-stone-200 dark:border-stone-800 shadow-xl flex flex-col h-full overflow-hidden transition-colors duration-300 ${rightSidebarCollapsed ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100'}`}>
-            <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between shrink-0">
-              <h2 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">{t.details}</h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setLanguage(language === 'en' ? 'ms' : 'en')}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-xs font-semibold border border-stone-200/20 dark:border-stone-700/30"
-                  title="Change Language / Tukar Bahasa"
-                >
-                  <Languages size={13} />
-                  <span>{language === 'en' ? 'EN' : 'BM'}</span>
-                </button>
-                <button onClick={() => setRightSidebarCollapsed(true)} className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors">
-                  <CloseIcon size={18} />
-                </button>
+            <div className={`w-full bg-white dark:bg-stone-900 border-l border-stone-200 dark:border-stone-800 shadow-xl flex flex-col h-full overflow-hidden transition-colors duration-300 ${rightSidebarCollapsed ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100'}`}>
+              <div className="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between shrink-0">
+                <h2 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">{t.details}</h2>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setLanguage(language === 'en' ? 'ms' : 'en')}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-xs font-semibold border border-stone-200/20 dark:border-stone-700/30"
+                    title="Change Language / Tukar Bahasa"
+                  >
+                    <Languages size={13} />
+                    <span>{language === 'en' ? 'EN' : 'BM'}</span>
+                  </button>
+                  <button onClick={() => setRightSidebarCollapsed(true)} className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors">
+                    <CloseIcon size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <DetailsPanel 
+                  plant={selectedPlant}
+                  part={selectedPart}
+                  compound={selectedCompound}
+                  onCompoundClick={handleCompoundClick}
+                  onBackToPlant={handleBackToPlant}
+                  onBackToPart={handleBackToPart}
+                  isMobile={isMobile}
+                />
               </div>
             </div>
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <DetailsPanel 
-                plant={selectedPlant}
-                part={selectedPart}
-                compound={selectedCompound}
-                onCompoundClick={handleCompoundClick}
-                onBackToPlant={handleBackToPlant}
-                onBackToPart={handleBackToPart}
-                isMobile={isMobile}
-              />
-            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Disclaimer Overlay Modal */}
