@@ -55,27 +55,30 @@ export function compileAllQuizQuestions(lang: 'en' | 'ms'): string {
     // 1. Question about plant parts
     const partNames = plant.parts.map(p => translateDb(p.name, lang));
     if (plant.parts.length > 0) {
-      const isJavaTea = plant.id === 'misai-kucing';
-      const rootOption = isJavaTea 
-        ? (isEn ? 'Root' : 'Akar') 
-        : (isEn ? 'Root Bark' : 'Kulit Akar');
+      let targetPartName = partNames[0];
+      if (plant.id === 'misai-kucing') {
+        const leavesIdx = plant.parts.findIndex(p => p.id === 'leaves' || p.id.includes('leaves'));
+        if (leavesIdx !== -1) {
+          targetPartName = partNames[leavesIdx];
+        }
+      }
 
       const partOptions = getDeterministicOptions(plant.id, [
-        partNames[0],
-        rootOption,
-        isEn ? 'Wood Core' : 'Teras Kayu',
+        targetPartName,
+        isEn ? 'Root' : 'Akar',
+        isEn ? 'Wood/Bark/Stem' : 'Kayu/Kulit/Batang',
         isEn ? 'Pollen' : 'Debunga'
       ]);
 
-      const correctAnsIdx = partOptions.indexOf(partNames[0]);
+      const correctAnsIdx = partOptions.indexOf(targetPartName);
       const correctLetter = String.fromCharCode(65 + correctAnsIdx); // A, B, C, D
 
       lines.push(`    Q${qCounter}: ${isEn ? `Which part of ${pName} is predominantly used in traditional medicine?` : `Bahagian manakah pada ${pName} yang paling banyak digunakan dalam perubatan tradisional?`}`);
       partOptions.forEach((opt, idx) => {
         lines.push(`       ${String.fromCharCode(65 + idx)}) ${opt}`);
       });
-      lines.push(`    👉  CORRECT ANSWER: ${correctLetter} (${partNames[0]})`);
-      lines.push(`       EXPLANATION: ${isEn ? `The ${partNames[0]} is a primary source of therapeutic compounds.` : `${partNames[0]} adalah sumber utama sebatian terapeutik.`}`);
+      lines.push(`    👉  CORRECT ANSWER: ${correctLetter} (${targetPartName})`);
+      lines.push(`       EXPLANATION: ${isEn ? `The ${targetPartName} is a primary source of therapeutic compounds.` : `${targetPartName} adalah sumber utama sebatian terapeutik.`}`);
       lines.push("");
       qCounter++;
     }
