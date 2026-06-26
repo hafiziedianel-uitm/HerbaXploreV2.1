@@ -8,7 +8,7 @@ import { DetailsPanel } from "./DetailsPanel";
 import { PlantComparison } from "./PlantComparison";
 import { 
   Leaf, ArrowLeft, Search, Moon, Sun, ChevronLeft, ChevronRight, Menu, X as CloseIcon, 
-  SlidersHorizontal, Filter, RotateCcw, Home, Languages, AlertCircle, ShieldCheck,
+  SlidersHorizontal, Filter, RotateCcw, Home, Languages, AlertCircle, ShieldCheck, ShieldAlert,
   Wifi, WifiOff, RefreshCw, Trash2, Database, CheckCircle, DownloadCloud, Globe,
   ArrowLeftRight
 } from "lucide-react";
@@ -22,6 +22,8 @@ import {
   getOfflineStats, 
   clearOfflineCaches 
 } from "@/lib/offlineCache";
+import { useBotDetection } from "@/lib/security";
+import { BotShieldIndicator } from "./BotShieldIndicator";
 
 const BIOACTIVE_OPTIONS = [
   "Flavonoid",
@@ -63,6 +65,19 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
   const [mounted, setMounted] = useState(false);
   const { language, setLanguage } = useLanguage();
   const t = translations[language];
+
+  // ShieldX Bot & Spam Defense System
+  const {
+    humanScore: rawHumanScore,
+    isBotConfirmed,
+    rateLimitStatus,
+    registerAction,
+    triggerHoneypotFlag,
+  } = useBotDetection();
+
+  const [overrideBotFlag, setOverrideBotFlag] = useState(false);
+  const activeBotFlag = isBotConfirmed && !overrideBotFlag;
+  const humanScore = activeBotFlag ? 0 : (overrideBotFlag ? 100 : rawHumanScore);
 
   const [selectedPlant, setSelectedPlant] = useState<Plant>(plantsData[0]);
   const [selectedPart, setSelectedPart] = useState<PlantPart | null>(null);
@@ -169,6 +184,18 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
       await clearOfflineCaches();
       const updatedStats = await getOfflineStats();
       setCacheStats(updatedStats);
+    }
+  };
+
+  const handleSimulateSpam = () => {
+    for (let i = 0; i < 15; i++) {
+      registerAction("dashboard-interaction");
+    }
+  };
+
+  const handleSearchChange = (val: string) => {
+    if (registerAction("dashboard-interaction")) {
+      setSearchQuery(val);
     }
   };
 
@@ -439,6 +466,15 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               </button>
             )}
 
+            {/* ShieldX Security Bot Protection Indicator */}
+            <BotShieldIndicator
+              humanScore={humanScore}
+              isBotConfirmed={isBotConfirmed}
+              rateLimitStatus={rateLimitStatus}
+              triggerHoneypotFlag={triggerHoneypotFlag}
+              onSimulateSpam={handleSimulateSpam}
+            />
+
             {/* Search Plants Toggle */}
             <button
               onClick={() => setLeftSidebarCollapsed(!leftSidebarCollapsed)}
@@ -475,7 +511,92 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Left Sidebar Overlay for Mobile */}
+        {activeBotFlag ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 bg-stone-50 dark:bg-stone-950 transition-colors duration-300">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="max-w-md w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-8 shadow-2xl text-center space-y-6"
+            >
+              <div className="w-16 h-16 mx-auto bg-rose-500/10 text-rose-500 rounded-2xl flex items-center justify-center animate-bounce">
+                <ShieldAlert size={36} />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-xl font-extrabold text-stone-800 dark:text-stone-100 uppercase tracking-wider">
+                  {language === 'en' ? "Access Temporarily Suspended" : "Akses Digantung Sementara"}
+                </h2>
+                <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed font-semibold uppercase tracking-widest font-mono">
+                  {language === 'en' ? "Anti-Bot Honeypot Intercept" : "Pintasan Honeypot Anti-Bot"}
+                </p>
+                <p className="text-sm text-stone-600 dark:text-stone-400 pt-2 leading-relaxed">
+                  {language === 'en' 
+                    ? "Our automated protection detected bot-like patterns (such as hidden form injection). To prove you are human and restore high-speed pharmacognosy access, please verify below."
+                    : "Sistem pertahanan mengesan corak seumpama bot (seperti kemasukan borang tersembunyi). Sila lengkapkan pengesahan di bawah untuk meneruskan akses HerbaXplorer."}
+                </p>
+              </div>
+
+              {/* Mini Puzzle */}
+              <div className="bg-stone-50 dark:bg-stone-950 p-5 rounded-2xl border border-stone-150 dark:border-stone-800 space-y-4">
+                <span className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block font-mono">
+                  {language === 'en' ? "Pharmacognosy Verification Challenge" : "Cabaran Pengesahan Farmakognosi"}
+                </span>
+                
+                <p className="text-xs font-bold text-stone-700 dark:text-stone-300">
+                  {language === 'en'
+                    ? 'Identify Orthosiphon stamineus by its popular name:'
+                    : 'Kenal pasti Orthosiphon stamineus mengikut nama popularnya:'}
+                </p>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { key: "misai-kucing", label: "Misai Kucing", correct: true },
+                    { key: "tongkat-ali", label: "Tongkat Ali", correct: false },
+                    { key: "gelenggang", label: "Gelenggang", correct: false },
+                    { key: "dukung-anak", label: "Dukung Anak", correct: false }
+                  ].map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        if (item.correct) {
+                          setOverrideBotFlag(true);
+                        } else {
+                          alert(language === 'en' ? "Incorrect, please select again!" : "Salah, sila pilih semula!");
+                        }
+                      }}
+                      className="p-3 bg-white hover:bg-emerald-50 dark:bg-stone-900 dark:hover:bg-emerald-950/20 border border-stone-200 dark:border-stone-850 hover:border-emerald-300 dark:hover:border-emerald-900 rounded-xl text-xs font-bold text-stone-700 dark:text-stone-300 transition active:scale-95 shadow-sm"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-[10px] text-stone-400 dark:text-stone-500">
+                UiTM Faculty of Pharmacy • KIK NatureRx • Security Sandbox
+              </p>
+            </motion.div>
+          </div>
+        ) : (
+          <>
+            {/* Invisible Honeypot Field */}
+            <div style={{ position: 'absolute', opacity: 0, height: 0, width: 0, overflow: 'hidden', zIndex: -1 }}>
+              <label htmlFor="faculty_verification_hash">Verification Hash</label>
+              <input
+                id="faculty_verification_hash"
+                name="faculty_verification_hash"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    triggerHoneypotFlag();
+                  }
+                }}
+              />
+            </div>
+
+            {/* Left Sidebar Overlay for Mobile */}
         {isMobile && !leftSidebarCollapsed && (
           <div 
             className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
@@ -524,7 +645,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                 <input 
                   type="text" 
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   placeholder={t.searchPlaceholder} 
                   className="w-full bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg pl-9 pr-3 py-2 text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-stone-400 dark:placeholder:text-stone-500"
                 />
@@ -848,6 +969,8 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
 
