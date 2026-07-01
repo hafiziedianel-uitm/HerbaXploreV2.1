@@ -17,7 +17,7 @@ export const translations = {
     interactiveExplorer: "Interactive Medicinal Plants Explorer",
     appTitle: "Faculty of Pharmacy:",
     appSubtitle: "HerbaXplorer",
-    appDescription: "An advanced interactive educational tool specifically designed to enhance the <strong>Teaching and Learning (T&L)</strong> of the subject of <strong>Pharmacognosy (PHC614)</strong>. Directly aligns with the <strong>UiTM Strategic Plan 2025</strong> to support flexible, technology-driven teaching pedagogies.",
+    appDescription: "An advanced interactive educational tool specifically designed to enhance the <strong>Teaching and Learning (T&L)</strong> of <strong>Pharmacognosy subject (PHC614)</strong>. Directly aligns with the <strong>UiTM Strategic Plan 2025</strong> to support flexible, technology-driven teaching pedagogies.",
     launchPortal: "Launch Explorer Portal",
     lookupTime: "Lookup Time Reduction",
     lookupTimeDesc: "Replaces traditional static 2D handbooks with instantaneous indexed search query speeds.",
