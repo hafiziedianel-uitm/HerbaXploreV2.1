@@ -996,10 +996,10 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white dark:bg-stone-900 border border-amber-500/30 rounded-xl shadow-xs shrink-0">
                     <Image 
-                      src="/uitm-logo.svg" 
+                      src="/uitm-logo.png" 
                       alt="UiTM Logo" 
-                      width={120} 
-                      height={36} 
+                      width={140} 
+                      height={40} 
                       className="h-7 w-auto object-contain dark:brightness-110"
                       referrerPolicy="no-referrer"
                     />
@@ -1039,7 +1039,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                             : '1. Intellectual Property Ownership & Work Registration'}
                         </h4>
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-[10px] font-bold text-stone-900 dark:text-amber-300">
-                          <Image src="/uitm-logo.svg" alt="UiTM" width={50} height={15} className="h-3.5 w-auto" />
+                          <Image src="/uitm-logo.png" alt="UiTM Logo" width={60} height={20} className="h-4 w-auto object-contain" />
                           <span>Owner (Pemunya): UNIVERSITI TEKNOLOGI MARA (UiTM)</span>
                         </div>
                       </div>

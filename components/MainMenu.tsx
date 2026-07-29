@@ -654,10 +654,10 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
                   {/* UiTM Official Logo Badge */}
                   <div className="p-2.5 bg-white dark:bg-stone-900 border border-amber-500/30 rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
                     <Image 
-                      src="/uitm-logo.svg" 
+                      src="/uitm-logo.png" 
                       alt="UiTM Universiti Teknologi MARA Logo" 
-                      width={180} 
-                      height={50} 
+                      width={220} 
+                      height={60} 
                       className="h-10 w-auto object-contain dark:brightness-110"
                       referrerPolicy="no-referrer"
                     />
