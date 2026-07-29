@@ -27,7 +27,8 @@ import {
   ChevronRight,
   Play,
   Pause,
-  AlertCircle
+  AlertCircle,
+  Award
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -639,6 +640,123 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
             </div>
           </motion.div>
 
+          {/* OFFICIAL COPYRIGHT NOTIFICATION CERTIFICATE SECTION */}
+          <motion.div variants={itemVariants} className="pt-10 border-t border-stone-200 dark:border-stone-900 text-left">
+            <div className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-emerald-500/10 dark:from-amber-500/15 dark:via-stone-900/80 dark:to-emerald-950/30 border border-amber-500/30 dark:border-amber-500/25 rounded-3xl p-6 sm:p-8 shadow-lg relative overflow-hidden backdrop-blur-sm">
+              {/* Decorative background watermark badge */}
+              <div className="absolute -right-8 -bottom-8 opacity-5 dark:opacity-10 pointer-events-none text-amber-500">
+                <Award size={200} />
+              </div>
+
+              {/* Top Badge Header */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-amber-500/20 dark:border-amber-500/15">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl shadow-md shrink-0">
+                    <Award size={24} />
+                  </div>
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/25 text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
+                      <span>Sijil Pemberitahuan Hak Cipta • MyIPO</span>
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
+                      {t.copyrightTitle}
+                    </h3>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">
+                      {t.copyrightSubtitle}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Official Notification Number Badge */}
+                <div className="bg-white dark:bg-stone-950/80 border-2 border-amber-500/40 dark:border-amber-500/30 rounded-2xl p-3 px-4 shadow-sm shrink-0">
+                  <span className="text-[9px] font-mono font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest block">
+                    {t.notificationNoLabel}
+                  </span>
+                  <span className="text-base sm:text-lg font-mono font-black text-stone-900 dark:text-amber-300 tracking-wider">
+                    CRLY2026W04274
+                  </span>
+                </div>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-6 border-b border-amber-500/20 dark:border-amber-500/15 text-xs">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-mono font-bold text-stone-400 dark:text-stone-500">
+                    {t.titleOfWorkLabel}
+                  </span>
+                  <p className="font-extrabold text-stone-850 dark:text-stone-200 leading-snug">
+                    HERBAXPLORER : APLIKASI WEB VISUALISASI 3D FARMAKOGNASI
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-mono font-bold text-stone-400 dark:text-stone-500">
+                    {t.categoryOfWorkLabel}
+                  </span>
+                  <p className="font-extrabold text-stone-850 dark:text-stone-200">
+                    SASTERA (LITERARY WORK)
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-mono font-bold text-stone-400 dark:text-stone-500">
+                    {t.dateOfCreationLabel} / Notification
+                  </span>
+                  <p className="font-extrabold text-stone-850 dark:text-stone-200 font-mono">
+                    15 JUNE 2026 • 22 JUNE 2026
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase font-mono font-bold text-stone-400 dark:text-stone-500">
+                    {t.copyrightOwnerLabel}
+                  </span>
+                  <p className="font-extrabold text-emerald-700 dark:text-emerald-400">
+                    UNIVERSITI TEKNOLOGI MARA (UiTM)
+                  </p>
+                </div>
+              </div>
+
+              {/* Registered Copyright Authors (Pencipta) List */}
+              <div className="pt-5 space-y-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                  <span className="text-xs font-mono font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                    <span>{t.registeredAuthorsLabel}:</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-stone-500 dark:text-stone-400">
+                    Pengawal Hak Cipta Malaysia (Copyright Controller of Malaysia • MyIPO)
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                  {[
+                    "MOHAMMAD HAFIZIE DIANEL BIN MOHD TAZIZI",
+                    "SYED ADNAN ALI SHAH",
+                    "SADIA SULTAN",
+                    "KAMRAN ASHRAF",
+                    "SABRINA SHARMIN",
+                    "ABU SADAT MD SAYEM",
+                    "NUR SYAMIMI BINTI ARIFFIN",
+                    "NURUL FARHANAH BINTI MISRIPIN"
+                  ].map((authorName, index) => (
+                    <div 
+                      key={index}
+                      className="p-2.5 bg-white/80 dark:bg-stone-900/70 border border-stone-200/80 dark:border-stone-800 rounded-xl flex items-center gap-2 shadow-xs"
+                    >
+                      <span className="w-5 h-5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 font-mono font-bold text-[10px] flex items-center justify-center shrink-0">
+                        {index + 1}
+                      </span>
+                      <span className="text-[11px] font-bold text-stone-800 dark:text-stone-200 leading-tight truncate" title={authorName}>
+                        {authorName}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* COMMITTEE PORTRAIT DIRECTORY SECTION */}
           <motion.div variants={itemVariants} className="pt-12 border-t border-stone-200 dark:border-stone-900 text-left">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-5 mb-8">
@@ -824,7 +942,7 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
           <span className="hidden md:inline">TRL: <span className="text-emerald-650 dark:text-emerald-400 font-bold">{t.demo}</span></span>
         </div>
         <div>
-          <span>© {new Date().getFullYear()} Faculty of Pharmacy • HerbaXplorer</span>
+          <span>© {new Date().getFullYear()} Faculty of Pharmacy • HerbaXplorer © (CRLY2026W04274)</span>
         </div>
       </footer>
     </div>

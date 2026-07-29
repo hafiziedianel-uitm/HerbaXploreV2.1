@@ -5,8 +5,8 @@ import { LanguageProvider } from '@/lib/LanguageContext';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'HerbaXplore UiTM',
-  description: 'Fakulti Farmasi UiTM',
+  title: 'HerbaXplorer © | Faculty of Pharmacy UiTM',
+  description: 'Fakulti Farmasi UiTM - HerbaXplorer © Aplikasi Web Visualisasi 3D Farmakognosi',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

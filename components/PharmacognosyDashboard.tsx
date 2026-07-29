@@ -417,7 +417,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
             <Leaf size={isMobile ? 20 : 24} />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-bold text-stone-800 dark:text-stone-100 leading-tight">HerbaXplorer</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-stone-800 dark:text-stone-100 leading-tight">HerbaXplorer ©</h1>
             {!isMobile && <p className="text-sm text-stone-500 dark:text-stone-400 font-medium">{t.interactiveMoleculeDB}</p>}
           </div>
         </div>
