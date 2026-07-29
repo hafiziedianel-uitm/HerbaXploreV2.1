@@ -994,13 +994,14 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b border-stone-150 dark:border-stone-800/80 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white dark:bg-stone-900 border border-amber-500/30 rounded-xl shadow-xs shrink-0">
+                  <div className="p-2 bg-white border border-amber-500/40 rounded-xl shadow-xs shrink-0 flex items-center justify-center min-w-[100px]">
                     <Image 
                       src="/uitm-logo.png" 
                       alt="UiTM Logo" 
                       width={140} 
-                      height={40} 
-                      className="h-7 w-auto object-contain dark:brightness-110"
+                      height={50} 
+                      unoptimized
+                      className="h-8 w-auto object-contain"
                       referrerPolicy="no-referrer"
                     />
                   </div>
@@ -1038,9 +1039,9 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                             ? '1. Pemilikan Harta Intelek & Pendaftaran Karya' 
                             : '1. Intellectual Property Ownership & Work Registration'}
                         </h4>
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-[10px] font-bold text-stone-900 dark:text-amber-300">
-                          <Image src="/uitm-logo.png" alt="UiTM Logo" width={60} height={20} className="h-4 w-auto object-contain" />
-                          <span>Owner (Pemunya): UNIVERSITI TEKNOLOGI MARA (UiTM)</span>
+                        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white border border-amber-500/30 text-[10px] font-bold text-stone-900 shadow-xs">
+                          <Image src="/uitm-logo.png" alt="UiTM Logo" width={60} height={20} unoptimized className="h-4 w-auto object-contain" />
+                          <span>Owner (Pemunya): <strong>UNIVERSITI TEKNOLOGI MARA (UiTM)</strong></span>
                         </div>
                       </div>
                       <p className="text-[11px] whitespace-pre-line leading-relaxed text-stone-600 dark:text-stone-400">

@@ -652,13 +652,14 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-amber-500/20 dark:border-amber-500/15">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   {/* UiTM Official Logo Badge */}
-                  <div className="p-2.5 bg-white dark:bg-stone-900 border border-amber-500/30 rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
+                  <div className="p-2.5 sm:p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-md shrink-0 flex items-center justify-center min-w-[140px]">
                     <Image 
                       src="/uitm-logo.png" 
                       alt="UiTM Universiti Teknologi MARA Logo" 
                       width={220} 
-                      height={60} 
-                      className="h-10 w-auto object-contain dark:brightness-110"
+                      height={84} 
+                      unoptimized
+                      className="h-10 sm:h-12 w-auto object-contain"
                       referrerPolicy="no-referrer"
                     />
                   </div>
