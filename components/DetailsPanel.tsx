@@ -441,12 +441,18 @@ function Interactive3DViewer({
             throw new Error('Failed to fetch PDB structure');
           }
           pdbData = await response.text();
+          if (pdbData.trim().startsWith("<!DOCTYPE") || pdbData.trim().startsWith("<html") || pdbData.trim().startsWith("<Error")) {
+            throw new Error('Invalid PDB structure returned');
+          }
         } else {
           const response = await fetchWithCache(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=3d`);
           if (!response.ok) {
             throw new Error('Failed to fetch 3D structure');
           }
           sdfData = await response.text();
+          if (sdfData.trim().startsWith("<!DOCTYPE") || sdfData.trim().startsWith("<html") || sdfData.trim().startsWith("<Error")) {
+            throw new Error('Invalid 3D structure returned');
+          }
         }
 
         if (!active) return;
@@ -1123,14 +1129,15 @@ function NpraSearchSection({ plant }: { plant: Plant }) {
     setLoading(true);
     setError(null);
     try {
-      let res = await fetchWithCache(`/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
-      if (res.status === 404) {
-        res = await fetchWithCache(`/app/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
-      }
+      const res = await fetchWithCache(`/api/npra?term=${encodeURIComponent(termToSearch)}&category=${category}&searchBy=${searchByMode}`);
       if (!res.ok) {
         throw new Error("Unable to contact Quest 3+ database proxy");
       }
-      const data = await res.json();
+      const rawText = await res.text();
+      if (!rawText.trim().startsWith("{") && !rawText.trim().startsWith("[")) {
+        throw new Error("Invalid response format received from NPRA proxy");
+      }
+      const data = JSON.parse(rawText);
       if (data.error) {
         throw new Error(data.error);
       }
@@ -1546,7 +1553,11 @@ function PublicationsSection({ plantName, compoundName }: { plantName: string; c
         if (!response.ok) {
           throw new Error("Failed to load publication records");
         }
-        const data = await response.json();
+        const rawText = await response.text();
+        if (!rawText.trim().startsWith("{") && !rawText.trim().startsWith("[")) {
+          throw new Error("Invalid response format received for publications");
+        }
+        const data = JSON.parse(rawText);
         if (active) {
           setPublications(data.publications || []);
           setApiStatus(data.apiStatus || "success");

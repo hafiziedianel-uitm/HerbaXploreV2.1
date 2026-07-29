@@ -13,7 +13,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className="antialiased">
-        <script src="https://3Dmol.org/build/3Dmol-min.js" async />
+        <Script src="https://3Dmol.org/build/3Dmol-min.js" strategy="afterInteractive" />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

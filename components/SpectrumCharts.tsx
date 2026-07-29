@@ -87,7 +87,11 @@ function useCompoundSpectra(compoundName: string) {
         if (!response.ok) {
           throw new Error(`Endpoint returned status ${response.status}`);
         }
-        const json = await response.json();
+        const rawText = await response.text();
+        if (!rawText.trim().startsWith("{") && !rawText.trim().startsWith("[")) {
+          throw new Error("Invalid response format received for NMR spectra");
+        }
+        const json = JSON.parse(rawText);
         if (active) {
           setData(json);
         }

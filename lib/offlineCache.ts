@@ -178,9 +178,12 @@ export async function fetchWithCache(url: string, options?: RequestInit): Promis
   if (response.ok && (options?.method === "GET" || !options?.method)) {
     try {
       const text = await response.clone().text();
-      // Only cache if under 1.5MB to avoid localStorage capacity issues
-      if (text.length < 1500000) {
-        localStorage.setItem(localStorageCacheKey, text);
+      // Only cache valid data responses (not HTML error pages) under 1.5MB
+      const trimmed = text.trim();
+      if (!trimmed.startsWith("<!DOCTYPE") && !trimmed.startsWith("<html")) {
+        if (text.length < 1500000) {
+          localStorage.setItem(localStorageCacheKey, text);
+        }
       }
     } catch (e) {
       // Ignore quota errors silently

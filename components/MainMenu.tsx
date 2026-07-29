@@ -650,9 +650,17 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
 
               {/* Top Badge Header */}
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-amber-500/20 dark:border-amber-500/15">
-                <div className="flex items-center gap-3.5">
-                  <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl shadow-md shrink-0">
-                    <Award size={24} />
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  {/* UiTM Official Logo Badge */}
+                  <div className="p-2.5 bg-white dark:bg-stone-900 border border-amber-500/30 rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
+                    <Image 
+                      src="/uitm-logo.svg" 
+                      alt="UiTM Universiti Teknologi MARA Logo" 
+                      width={180} 
+                      height={50} 
+                      className="h-10 w-auto object-contain dark:brightness-110"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
                   <div>
                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/25 text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
@@ -707,13 +715,18 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
                   </p>
                 </div>
 
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase font-mono font-bold text-stone-400 dark:text-stone-500">
+                <div className="space-y-1 bg-amber-500/10 dark:bg-amber-500/15 p-2.5 rounded-xl border border-amber-500/25">
+                  <span className="text-[10px] uppercase font-mono font-bold text-amber-800 dark:text-amber-400 block">
                     {t.copyrightOwnerLabel}
                   </span>
-                  <p className="font-extrabold text-emerald-700 dark:text-emerald-400">
-                    UNIVERSITI TEKNOLOGI MARA (UiTM)
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-black text-stone-900 dark:text-stone-100 text-xs leading-tight">
+                      UNIVERSITI TEKNOLOGI MARA (UiTM)
+                    </p>
+                  </div>
+                  <span className="text-[9px] font-mono text-emerald-700 dark:text-emerald-400 font-bold block">
+                    ✓ Pemunya Hak Cipta Rasmi
+                  </span>
                 </div>
               </div>
 

@@ -36,22 +36,26 @@ export async function GET(req: NextRequest) {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        apiStatus = "success";
-        const data = await response.json();
-        
-        const results = data.resultList?.result || [];
-        publications = results.map((item: any) => ({
-          id: item.id || item.pmid || `${Math.random()}`,
-          title: item.title || "Untitled Paper",
-          authors: item.authorString || "Unknown Authors",
-          journal: item.journalTitle || item.bookOrReportDetails?.publisher || "Journal of Pharmacognosy",
-          year: item.pubYear || "N/A",
-          doi: item.doi || "",
-          url: item.doi 
-            ? `https://doi.org/${item.doi}` 
-            : (item.pmcid ? `https://www.ncbi.nlm.nih.gov/pmc/articles/${item.pmcid}` : `https://europepmc.org/article/MED/${item.id}`),
-          citationCount: item.citedByCount || 0,
-        }));
+        const text = await response.text();
+        if (text.trim().startsWith("{") || text.trim().startsWith("[")) {
+          apiStatus = "success";
+          const data = JSON.parse(text);
+          const results = data.resultList?.result || [];
+          publications = results.map((item: any) => ({
+            id: item.id || item.pmid || `${Math.random()}`,
+            title: item.title || "Untitled Paper",
+            authors: item.authorString || "Unknown Authors",
+            journal: item.journalTitle || item.bookOrReportDetails?.publisher || "Journal of Pharmacognosy",
+            year: item.pubYear || "N/A",
+            doi: item.doi || "",
+            url: item.doi 
+              ? `https://doi.org/${item.doi}` 
+              : (item.pmcid ? `https://www.ncbi.nlm.nih.gov/pmc/articles/${item.pmcid}` : `https://europepmc.org/article/MED/${item.id}`),
+            citationCount: item.citedByCount || 0,
+          }));
+        } else {
+          apiStatus = "invalid_json_response";
+        }
       } else {
         apiStatus = `http_error_${response.status}`;
       }

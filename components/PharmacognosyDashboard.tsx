@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
@@ -992,16 +993,23 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
             >
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b border-stone-150 dark:border-stone-800/80 shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-emerald-550/10 text-emerald-600 dark:text-emerald-400 rounded-xl">
-                    <ShieldCheck size={24} />
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white dark:bg-stone-900 border border-amber-500/30 rounded-xl shadow-xs shrink-0">
+                    <Image 
+                      src="/uitm-logo.svg" 
+                      alt="UiTM Logo" 
+                      width={120} 
+                      height={36} 
+                      className="h-7 w-auto object-contain dark:brightness-110"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
                   <div>
                     <h3 className="text-sm md:text-base font-extrabold text-stone-800 dark:text-stone-100 uppercase tracking-wide">
                       {language === 'ms' ? 'Penafian & Maklumat Hak Cipta' : 'Disclaimer & Copyright Information'}
                     </h3>
                     <p className="text-[10px] text-stone-400 dark:text-stone-500">
-                      Faculty of Pharmacy • UiTM KIK Project HerbaXplorer
+                      Faculty of Pharmacy • UiTM KIK Project HerbaXplorer © (CRLY2026W04274)
                     </p>
                   </div>
                 </div>
@@ -1023,12 +1031,18 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                 <div className="bg-emerald-500/[0.03] dark:bg-emerald-500/[0.01] p-4 rounded-2xl border border-emerald-500/10 dark:border-emerald-500/5 space-y-3">
                   <div className="flex gap-2.5 items-start">
                     <ShieldCheck className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" size={18} />
-                    <div className="space-y-1.5">
-                      <h4 className="font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wide text-[11px]">
-                        {language === 'ms' 
-                          ? '1. Pemilikan Harta Intelek & Pendaftaran Karya' 
-                          : '1. Intellectual Property Ownership & Work Registration'}
-                      </h4>
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h4 className="font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wide text-[11px]">
+                          {language === 'ms' 
+                            ? '1. Pemilikan Harta Intelek & Pendaftaran Karya' 
+                            : '1. Intellectual Property Ownership & Work Registration'}
+                        </h4>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-[10px] font-bold text-stone-900 dark:text-amber-300">
+                          <Image src="/uitm-logo.svg" alt="UiTM" width={50} height={15} className="h-3.5 w-auto" />
+                          <span>Owner (Pemunya): UNIVERSITI TEKNOLOGI MARA (UiTM)</span>
+                        </div>
+                      </div>
                       <p className="text-[11px] whitespace-pre-line leading-relaxed text-stone-600 dark:text-stone-400">
                         {language === 'ms' ? (
                           <>
