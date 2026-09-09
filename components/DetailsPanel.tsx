@@ -2101,7 +2101,7 @@ export function DetailsPanel({
                         <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
                           {language === 'ms' ? 'Spektrum Jisim' : 'Mass Spectrum'}
                         </p>
-                        <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2">
+                        <div className="relative h-72 sm:h-80 min-h-[290px] rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2">
                           <MassSpectrumChart compoundName={compound.name} />
                         </div>
                       </div>
@@ -2113,7 +2113,7 @@ export function DetailsPanel({
                             {language === 'ms' ? 'Ketik untuk membuka & tugasan' : 'Click to expand & assignments'}
                           </span>
                         </p>
-                        <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-cyan-500/50 transition-colors">
+                        <div className="relative h-72 sm:h-80 min-h-[290px] rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-cyan-500/50 transition-colors cursor-pointer">
                           <NMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('1H'); setEnlargedChart({ compoundName: compound.name }); }} />
                         </div>
                       </div>
@@ -2125,7 +2125,7 @@ export function DetailsPanel({
                             {language === 'ms' ? 'Ketik untuk melihat tugasan karbon' : 'Click to view carbon assignments'}
                           </span>
                         </p>
-                        <div className="relative h-64 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-purple-500/50 transition-colors">
+                        <div className="relative h-72 sm:h-80 min-h-[290px] rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900/50 p-2 hover:border-purple-500/50 transition-colors cursor-pointer">
                           <CNMRSpectrumChart compoundName={compound.name} onClick={() => { setActiveSpectrumTab('13C'); setEnlargedChart({ compoundName: compound.name }); }} />
                         </div>
                       </div>
@@ -2353,7 +2353,7 @@ export function DetailsPanel({
               <div className="p-6 overflow-y-auto max-h-[80vh] custom-scrollbar space-y-8 bg-white dark:bg-stone-950">
                 {activeSpectrumTab === '1H' ? (
                   <>
-                    <div className="w-full h-[40vh] sm:h-[50vh] bg-stone-50 border border-stone-200 dark:bg-stone-900 dark:border-stone-800 rounded-2xl p-4">
+                    <div className="w-full h-[40vh] sm:h-[50vh] min-h-[300px] bg-stone-50 border border-stone-200 dark:bg-stone-900 dark:border-stone-800 rounded-2xl p-4">
                       <NMRSpectrumChart compoundName={enlargedChart.compoundName} />
                     </div>
                     
@@ -2367,7 +2367,7 @@ export function DetailsPanel({
                   </>
                 ) : (
                   <>
-                    <div className="w-full h-[40vh] sm:h-[50vh] bg-stone-50 border border-stone-200 dark:bg-stone-900 dark:border-stone-800 rounded-2xl p-4">
+                    <div className="w-full h-[40vh] sm:h-[50vh] min-h-[300px] bg-stone-50 border border-stone-200 dark:bg-stone-900 dark:border-stone-800 rounded-2xl p-4">
                       <CNMRSpectrumChart compoundName={enlargedChart.compoundName} />
                     </div>
                     

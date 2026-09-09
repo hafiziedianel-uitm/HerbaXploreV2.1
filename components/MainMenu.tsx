@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import { UitmLogo } from "./UitmLogo";
 import { useLanguage } from "@/lib/LanguageContext";
 import { translations } from "@/lib/i18n";
 
@@ -653,15 +654,7 @@ export function MainMenu({ onEnterApp }: MainMenuProps) {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   {/* UiTM Official Logo Badge */}
                   <div className="p-2.5 sm:p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-md shrink-0 flex items-center justify-center min-w-[140px]">
-                    <Image 
-                      src="/uitm-logo.png" 
-                      alt="UiTM Universiti Teknologi MARA Logo" 
-                      width={220} 
-                      height={84} 
-                      unoptimized
-                      className="h-10 sm:h-12 w-auto object-contain"
-                      referrerPolicy="no-referrer"
-                    />
+                    <UitmLogo size="md" className="h-10 sm:h-12 w-auto" />
                   </div>
                   <div>
                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/25 text-[10px] font-mono font-bold uppercase tracking-wider mb-1">

@@ -1,7 +1,8 @@
-const CACHE_NAME = 'herba-xplorer-cache-v1';
+const CACHE_NAME = 'herba-xplorer-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
+  '/uitm-logo.png',
   '/arabic-acid-2d.svg',
   '/sterculia-polysaccharide-2d.svg',
   'https://3Dmol.org/build/3Dmol-min.js'

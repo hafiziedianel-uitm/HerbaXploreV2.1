@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { UitmLogo } from "./UitmLogo";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { plantsData, Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
@@ -995,15 +996,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               <div className="flex justify-between items-center pb-4 border-b border-stone-150 dark:border-stone-800/80 shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white border border-amber-500/40 rounded-xl shadow-xs shrink-0 flex items-center justify-center min-w-[100px]">
-                    <Image 
-                      src="/uitm-logo.png" 
-                      alt="UiTM Logo" 
-                      width={140} 
-                      height={50} 
-                      unoptimized
-                      className="h-8 w-auto object-contain"
-                      referrerPolicy="no-referrer"
-                    />
+                    <UitmLogo size="sm" className="h-8 w-auto" />
                   </div>
                   <div>
                     <h3 className="text-sm md:text-base font-extrabold text-stone-800 dark:text-stone-100 uppercase tracking-wide">
@@ -1040,7 +1033,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
                             : '1. Intellectual Property Ownership & Work Registration'}
                         </h4>
                         <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white border border-amber-500/30 text-[10px] font-bold text-stone-900 shadow-xs">
-                          <Image src="/uitm-logo.png" alt="UiTM Logo" width={60} height={20} unoptimized className="h-4 w-auto object-contain" />
+                          <UitmLogo size="sm" className="h-4 w-auto" />
                           <span>Owner (Pemunya): <strong>UNIVERSITI TEKNOLOGI MARA (UiTM)</strong></span>
                         </div>
                       </div>

@@ -168,39 +168,44 @@ export function MassSpectrumChart({ compoundName }: MassSpectrumChartProps) {
   const isConnected = spec.apiConnection?.status === 'connected';
 
   return (
-    <div className="w-full h-full flex flex-col relative">
-      <div className="flex justify-between items-center text-xs text-stone-500 mb-2 px-3 pt-1">
-        <div className="flex items-center gap-1.5">
-          <Database className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="font-semibold text-stone-700 dark:text-stone-300">{spec.massSpecSource}</span>
+    <div className="w-full h-full flex flex-col justify-between relative">
+      <div className="flex flex-wrap sm:flex-nowrap justify-between items-center text-xs text-stone-500 mb-1.5 px-2.5 pt-1 gap-1">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+          <span className="font-semibold text-stone-700 dark:text-stone-300 text-[11px] sm:text-xs truncate">
+            {spec.massSpecSource}
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-1.5 py-0.5 rounded text-[10px]">{spec.massSpecType}</span>
-          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium ${isConnected ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-400'}`}>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono">
+            {spec.massSpecType}
+          </span>
+          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium ${isConnected ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-500'}`}>
             <Wifi className="w-2.5 h-2.5 mr-1 animate-pulse" />
             {isConnected ? 'Sync Real' : 'Local Cache'}
           </span>
         </div>
       </div>
       
-      <div className="flex-1 min-h-[180px]">
+      <div className="flex-1 min-h-[140px] sm:min-h-[160px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartPoints} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#444" opacity={0.1} />
+          <BarChart data={chartPoints} margin={{ top: 8, right: 14, left: -10, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#888" opacity={0.15} />
             <XAxis 
               dataKey="x" 
               type="number"
               domain={['auto', 'auto']}
               name="m/z"
-              label={{ value: 'm/z', position: 'bottom', fill: '#888', style: { fontSize: '10px' } }}
               stroke="#888"
-              tick={{ fill: '#888', fontSize: '9px' }}
+              tick={{ fill: '#888', fontSize: '10px' }}
+              tickMargin={4}
             />
             <YAxis 
-              label={{ value: 'Relative Abundance (%)', angle: -90, position: 'insideLeft', fill: '#888', style: { fontSize: '10px', textAnchor: 'middle' } }} 
               stroke="#888"
               tick={{ fill: '#888', fontSize: '9px' }}
+              tickMargin={2}
               domain={[0, 100]}
+              width={35}
             />
             <Tooltip 
               cursor={{ fill: 'rgba(16, 185, 129, 0.05)', strokeWidth: 1 }}
@@ -211,6 +216,15 @@ export function MassSpectrumChart({ compoundName }: MassSpectrumChartProps) {
             <Bar dataKey="y" fill="#10b981" barSize={3} />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Clean Dedicated Axis Label Bar */}
+      <div className="flex justify-between items-center px-3 pt-1.5 pb-0.5 text-[9px] sm:text-[10px] font-mono text-stone-500 dark:text-stone-400 border-t border-stone-200/50 dark:border-stone-800/50 select-none">
+        <span className="text-stone-400">Relative Abundance (% vs m/z)</span>
+        <span className="font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+          Mass Spec m/z (Da)
+        </span>
+        <span className="text-stone-400">EI-MS Peak</span>
       </div>
     </div>
   );
@@ -426,7 +440,7 @@ export function NMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPro
 
   return (
     <div 
-      className="w-full h-full flex flex-col group relative" 
+      className="w-full h-full flex flex-col justify-between group relative" 
       onClick={(e) => {
         if (dragDetected.current) {
           e.stopPropagation();
@@ -436,62 +450,68 @@ export function NMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPro
         onClick?.();
       }}
     >
-      <div className="flex justify-between items-center text-xs text-stone-500 mb-2 px-3 pt-1">
-        <div className="flex items-center gap-1.5">
-          <Database className="w-3.5 h-3.5 text-cyan-500 animate-pulse" />
-          <span className="font-semibold text-stone-700 dark:text-stone-300">
+      <div className="flex flex-wrap sm:flex-nowrap justify-between items-center text-xs text-stone-500 mb-1.5 px-2.5 pt-1 gap-1">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Database className="w-3.5 h-3.5 text-cyan-500 shrink-0 animate-pulse" />
+          <span className="font-semibold text-stone-700 dark:text-stone-300 text-[11px] sm:text-xs truncate">
             {spec.nmrSource} 
-            {isConnected && <span className="text-[10px] font-normal font-mono text-stone-400 ml-1">({latency}ms)</span>}
+            {isConnected && <span className="text-[9px] font-normal font-mono text-stone-400 ml-1">({latency}ms)</span>}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-1.5 py-0.5 rounded text-[10px]">{spec.nmrType}</span>
-          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium ${isConnected ? 'bg-cyan-500/10 text-cyan-500' : 'bg-stone-200 text-stone-600 dark:bg-stone-850 dark:text-stone-400'}`}>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono">
+            {spec.nmrType}
+          </span>
+          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium ${isConnected ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' : 'bg-stone-200 text-stone-600 dark:bg-stone-850 dark:text-stone-400'}`}>
             <Wifi className="w-2.5 h-2.5 mr-1" />
             {isConnected ? 'API Live' : 'Cached Sync'}
           </span>
         </div>
       </div>
 
-      {/* Dynamic interactive zoom toolbar */}
-      <div className="flex flex-wrap justify-between items-center gap-2 mb-2 px-3 py-1.5 bg-stone-50 dark:bg-stone-900/30 rounded-xl text-[10px] sm:text-[11px] border border-stone-200/50 dark:border-stone-800/50" onClick={(e) => e.stopPropagation()}>
-        <span className="font-medium text-stone-550 dark:text-stone-400 flex items-center gap-1">
-          <span className="text-cyan-550 dark:text-cyan-400 font-bold">🔍</span>
+      {/* Dynamic interactive zoom toolbar - compact and single line on mobile */}
+      <div className="flex items-center justify-between gap-1.5 mb-1.5 px-2.5 py-1 bg-stone-50 dark:bg-stone-900/40 rounded-xl text-[10px] border border-stone-200/60 dark:border-stone-800/60 select-none" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1 min-w-0 truncate">
+          <span className="text-cyan-500 font-bold shrink-0 text-xs">🔍</span>
           {zoomDomain ? (
-            <span>
-              Zoomed: <strong className="font-mono text-cyan-600 dark:text-cyan-400">{zoomDomain[1].toFixed(2)} - {zoomDomain[0].toFixed(2)}</strong> ppm
+            <span className="truncate font-mono text-[10px] text-stone-600 dark:text-stone-300">
+              <span className="hidden sm:inline">Zoom: </span>
+              <strong className="text-cyan-600 dark:text-cyan-400 font-bold">{zoomDomain[1].toFixed(2)}–{zoomDomain[0].toFixed(2)}</strong> ppm
             </span>
           ) : (
-            <span className="font-mono text-stone-400">💡 Drag a region on spectrum to zoom</span>
+            <span className="font-mono text-stone-400 dark:text-stone-500 text-[10px] truncate">
+              <span className="hidden sm:inline">💡 Drag spectrum region to zoom</span>
+              <span className="sm:hidden">Drag region to zoom</span>
+            </span>
           )}
-        </span>
+        </div>
         
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => handlePan('left')}
             title="Pan Left (Higher shift)"
-            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition font-mono"
+            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded font-mono text-xs transition"
           >
             ←
           </button>
           <button
             onClick={() => handleZoomIncrement('in')}
             title="Zoom In"
-            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition flex items-center justify-center"
+            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded transition flex items-center justify-center"
           >
             <ZoomIn size={12} />
           </button>
           <button
             onClick={() => handleZoomIncrement('out')}
             title="Zoom Out"
-            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition flex items-center justify-center"
+            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded transition flex items-center justify-center"
           >
             <ZoomOut size={12} />
           </button>
           <button
             onClick={() => handlePan('right')}
             title="Pan Right (Lower shift)"
-            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition font-mono"
+            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded font-mono text-xs transition"
           >
             →
           </button>
@@ -502,9 +522,9 @@ export function NMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPro
                 dragDetected.current = true;
               }}
               title="Reset Zoom"
-              className="ml-1 px-2 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 rounded-md transition flex items-center gap-1 font-bold"
+              className="ml-0.5 px-1.5 py-0.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 rounded transition flex items-center gap-1 font-bold text-[10px]"
             >
-              <RotateCcw size={10} /> Reset
+              <RotateCcw size={9} /> Reset
             </button>
           )}
         </div>
@@ -512,25 +532,26 @@ export function NMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPro
 
       <div className="absolute inset-0 bg-cyan-500/0 group-hover:bg-cyan-500/5 transition-colors z-10 pointer-events-none rounded-xl"></div>
       
-      <div className="flex-1 min-h-[180px]">
+      <div className="flex-1 min-h-[140px] sm:min-h-[160px] relative">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
             data={chartPoints} 
-            margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+            margin={{ top: 8, right: 12, left: 12, bottom: 4 }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#444" opacity={0.1} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#888" opacity={0.15} />
             <XAxis 
               dataKey="x" 
               type="number"
               domain={zoomDomain ? [zoomDomain[0], zoomDomain[1]] : ['dataMax', 'dataMin']} 
               allowDataOverflow={true}
               name="Chemical Shift (ppm)"
-              label={{ value: 'Chemical Shift (ppm)', position: 'bottom', fill: '#888', style: { fontSize: '10px' } }}
               stroke="#888"
-              tick={{ fill: '#888', fontSize: '9px' }}
+              tick={{ fill: '#888', fontSize: '10px' }}
+              tickMargin={4}
+              tickFormatter={(val) => Number(val).toFixed(1)}
               reversed={true}
             />
             <YAxis hide={true} domain={[0, 'dataMax']} />
@@ -559,6 +580,21 @@ export function NMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPro
             )}
           </LineChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Dedicated Non-Overlapping Axis Guide Below Spectrum */}
+      <div className="flex justify-between items-center px-3 pt-1.5 pb-0.5 text-[9px] sm:text-[10px] font-mono text-stone-500 dark:text-stone-400 border-t border-stone-200/50 dark:border-stone-800/50 select-none">
+        <span className="flex items-center gap-0.5 text-stone-400">
+          <span>← Upfield</span>
+          <span className="hidden xs:inline">(TMS 0)</span>
+        </span>
+        <span className="font-semibold text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">
+          1H Chemical Shift δ (ppm)
+        </span>
+        <span className="flex items-center gap-0.5 text-stone-400">
+          <span className="hidden xs:inline">Downfield</span>
+          <span>(Low field) →</span>
+        </span>
       </div>
     </div>
   );
@@ -871,7 +907,7 @@ export function CNMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPr
 
   return (
     <div 
-      className="w-full h-full flex flex-col group relative" 
+      className="w-full h-full flex flex-col justify-between group relative" 
       onClick={(e) => {
         if (dragDetected.current) {
           e.stopPropagation();
@@ -881,64 +917,68 @@ export function CNMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPr
         onClick?.();
       }}
     >
-      <div className="flex justify-between items-center text-xs text-stone-500 mb-2 px-3 pt-1">
-        <div className="flex items-center gap-1.5">
-          <Database className="w-3.5 h-3.5 text-purple-500 animate-pulse" />
-          <span className="font-semibold text-stone-700 dark:text-stone-300">
+      <div className="flex flex-wrap sm:flex-nowrap justify-between items-center text-xs text-stone-500 mb-1.5 px-2.5 pt-1 gap-1">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Database className="w-3.5 h-3.5 text-purple-500 shrink-0 animate-pulse" />
+          <span className="font-semibold text-stone-700 dark:text-stone-300 text-[11px] sm:text-xs truncate">
             {spec.cnmrSource || 'NMRShiftDB'} 
-            {isConnected && <span className="text-[10px] font-normal font-mono text-stone-400 ml-1">({latency}ms)</span>}
+            {isConnected && <span className="text-[9px] font-normal font-mono text-stone-400 ml-1">({latency}ms)</span>}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-1.5 py-0.5 rounded text-[10px]">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono">
             {spec.cnmrType || '13C-NMR (100 MHz, CDCl3)'}
           </span>
-          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium ${isConnected ? 'bg-purple-500/10 text-purple-500' : 'bg-stone-200 text-stone-600 dark:bg-stone-850 dark:text-stone-400'}`}>
+          <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium ${isConnected ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400' : 'bg-stone-200 text-stone-600 dark:bg-stone-850 dark:text-stone-400'}`}>
             <Wifi className="w-2.5 h-2.5 mr-1" />
             {isConnected ? 'API Live' : 'Cached Sync'}
           </span>
         </div>
       </div>
 
-      {/* Dynamic interactive zoom toolbar */}
-      <div className="flex flex-wrap justify-between items-center gap-2 mb-2 px-3 py-1.5 bg-stone-50 dark:bg-stone-900/30 rounded-xl text-[10px] sm:text-[11px] border border-stone-200/50 dark:border-stone-800/50" onClick={(e) => e.stopPropagation()}>
-        <span className="font-medium text-stone-550 dark:text-stone-400 flex items-center gap-1">
-          <span className="text-purple-500 font-bold">🔍</span>
+      {/* Dynamic interactive zoom toolbar - compact and single line on mobile */}
+      <div className="flex items-center justify-between gap-1.5 mb-1.5 px-2.5 py-1 bg-stone-50 dark:bg-stone-900/40 rounded-xl text-[10px] border border-stone-200/60 dark:border-stone-800/60 select-none" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1 min-w-0 truncate">
+          <span className="text-purple-500 font-bold shrink-0 text-xs">🔍</span>
           {zoomDomain ? (
-            <span>
-              Zoomed: <strong className="font-mono text-purple-600 dark:text-purple-400">{zoomDomain[1].toFixed(1)} - {zoomDomain[0].toFixed(1)}</strong> ppm
+            <span className="truncate font-mono text-[10px] text-stone-600 dark:text-stone-300">
+              <span className="hidden sm:inline">Zoom: </span>
+              <strong className="text-purple-600 dark:text-purple-400 font-bold">{zoomDomain[1].toFixed(1)}–{zoomDomain[0].toFixed(1)}</strong> ppm
             </span>
           ) : (
-            <span className="font-mono text-stone-400">💡 Drag a region on spectrum to zoom</span>
+            <span className="font-mono text-stone-400 dark:text-stone-500 text-[10px] truncate">
+              <span className="hidden sm:inline">💡 Drag spectrum region to zoom</span>
+              <span className="sm:hidden">Drag region to zoom</span>
+            </span>
           )}
-        </span>
+        </div>
         
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => handlePan('left')}
             title="Pan Left (Higher shift)"
-            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition font-mono"
+            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded font-mono text-xs transition"
           >
             ←
           </button>
           <button
             onClick={() => handleZoomIncrement('in')}
             title="Zoom In"
-            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition flex items-center justify-center"
+            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded transition flex items-center justify-center"
           >
             <ZoomIn size={12} />
           </button>
           <button
             onClick={() => handleZoomIncrement('out')}
             title="Zoom Out"
-            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition flex items-center justify-center"
+            className="p-1 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded transition flex items-center justify-center"
           >
             <ZoomOut size={12} />
           </button>
           <button
             onClick={() => handlePan('right')}
             title="Pan Right (Lower shift)"
-            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-805 text-stone-600 dark:text-stone-300 rounded-md transition font-mono"
+            className="px-1.5 py-0.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-600 dark:text-stone-300 rounded font-mono text-xs transition"
           >
             →
           </button>
@@ -949,9 +989,9 @@ export function CNMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPr
                 dragDetected.current = true;
               }}
               title="Reset Zoom"
-              className="ml-1 px-2 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-md transition flex items-center gap-1 font-bold"
+              className="ml-0.5 px-1.5 py-0.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded transition flex items-center gap-1 font-bold text-[10px]"
             >
-              <RotateCcw size={10} /> Reset
+              <RotateCcw size={9} /> Reset
             </button>
           )}
         </div>
@@ -959,25 +999,26 @@ export function CNMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPr
 
       <div className="absolute inset-0 bg-purple-500/0 group-hover:bg-purple-500/5 transition-colors z-10 pointer-events-none rounded-xl"></div>
       
-      <div className="flex-1 min-h-[180px]">
+      <div className="flex-1 min-h-[140px] sm:min-h-[160px] relative">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
             data={chartPoints} 
-            margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+            margin={{ top: 8, right: 12, left: 12, bottom: 4 }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#444" opacity={0.1} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#888" opacity={0.15} />
             <XAxis 
               dataKey="x" 
               type="number"
               domain={zoomDomain ? [zoomDomain[0], zoomDomain[1]] : ['dataMax', 'dataMin']} 
               allowDataOverflow={true}
               name="Chemical Shift (ppm)"
-              label={{ value: 'Chemical Shift (ppm)', position: 'bottom', fill: '#888', style: { fontSize: '10px' } }}
               stroke="#888"
-              tick={{ fill: '#888', fontSize: '9px' }}
+              tick={{ fill: '#888', fontSize: '10px' }}
+              tickMargin={4}
+              tickFormatter={(val) => Number(val).toFixed(0)}
               reversed={true}
             />
             <YAxis hide={true} domain={[0, 'dataMax']} />
@@ -1006,6 +1047,21 @@ export function CNMRSpectrumChart({ compoundName, onClick }: MassSpectrumChartPr
             )}
           </LineChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Dedicated Non-Overlapping Axis Guide Below Spectrum */}
+      <div className="flex justify-between items-center px-3 pt-1.5 pb-0.5 text-[9px] sm:text-[10px] font-mono text-stone-500 dark:text-stone-400 border-t border-stone-200/50 dark:border-stone-800/50 select-none">
+        <span className="flex items-center gap-0.5 text-stone-400">
+          <span>← High field</span>
+          <span className="hidden xs:inline">(0 ppm)</span>
+        </span>
+        <span className="font-semibold text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">
+          13C Chemical Shift δ (ppm)
+        </span>
+        <span className="flex items-center gap-0.5 text-stone-400">
+          <span className="hidden xs:inline">Downfield</span>
+          <span>(200+ ppm) →</span>
+        </span>
       </div>
     </div>
   );
