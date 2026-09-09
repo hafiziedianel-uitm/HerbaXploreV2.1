@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   ShieldAlert, ShieldCheck, AlertTriangle, Shield, CheckCircle2, 
@@ -14,7 +15,10 @@ interface BotShieldIndicatorProps {
   rateLimitStatus: Record<string, { blocked: boolean; resetSeconds: number }>;
   triggerHoneypotFlag: () => void;
   onSimulateSpam: () => void;
+  onOpenChange?: (isOpen: boolean) => void;
 }
+
+const emptySubscribe = () => () => {};
 
 export function BotShieldIndicator({
   humanScore,
@@ -22,10 +26,44 @@ export function BotShieldIndicator({
   rateLimitStatus,
   triggerHoneypotFlag,
   onSimulateSpam,
+  onOpenChange,
 }: BotShieldIndicatorProps) {
   const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
+  const handleOpen = () => {
+    setIsOpen(true);
+    onOpenChange?.(true);
+  };
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    onOpenChange?.(false);
+  }, [onOpenChange]);
+
+  // Close on Escape key press & body scroll locking
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen, handleClose]);
 
   const en = language === "en";
 
@@ -59,7 +97,7 @@ export function BotShieldIndicator({
     <>
       {/* Floating Status pill */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold transition-all hover:scale-[1.02] shadow-sm ${shieldColor}`}
         id="bot-shield-pill-btn"
       >
@@ -70,26 +108,32 @@ export function BotShieldIndicator({
         </span>
       </button>
 
-      {/* Modern Dialog Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="absolute inset-0 bg-stone-950/40 backdrop-blur-md"
-            />
-
-            {/* Modal Box */}
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 15 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 15 }}
-              className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl shadow-2xl overflow-hidden text-stone-850 dark:text-stone-100 z-10"
+      {/* Modern Dialog Overlay Portaled Directly to document.body */}
+      {mounted && typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <div 
+              className="fixed inset-0 flex items-center justify-center p-4 pointer-events-auto"
+              style={{ zIndex: 999999 }}
             >
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={handleClose}
+                className="fixed inset-0 bg-stone-950/80 backdrop-blur-md"
+                style={{ zIndex: 999999 }}
+              />
+
+              {/* Modal Box */}
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl shadow-2xl overflow-hidden text-stone-850 dark:text-stone-100"
+                style={{ zIndex: 1000000 }}
+              >
               {/* Header */}
               <div className="px-6 py-5 border-b border-stone-100 dark:border-stone-850 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/50">
                 <div className="flex items-center gap-2.5">
@@ -107,7 +151,7 @@ export function BotShieldIndicator({
                 </div>
 
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   className="p-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition"
                 >
                   <X size={18} />
@@ -264,9 +308,11 @@ export function BotShieldIndicator({
                 <span>Active 2026</span>
               </div>
             </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

@@ -17,6 +17,7 @@ interface PlantViewerProps {
   onPrevPlant?: () => void;
   currentPlantIndex?: number;
   totalPlantsCount?: number;
+  isOverlaySuppressed?: boolean;
 }
 
 export function PlantViewer({ 
@@ -28,7 +29,8 @@ export function PlantViewer({
   onNextPlant,
   onPrevPlant,
   currentPlantIndex = 0,
-  totalPlantsCount = 1
+  totalPlantsCount = 1,
+  isOverlaySuppressed = false,
 }: PlantViewerProps) {
   const [hoveredPart, setHoveredPart] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -99,7 +101,7 @@ export function PlantViewer({
               )}
             </AnimatePresence>
             
-            <div className="absolute inset-0 group-wrapper">
+            <div className={`absolute inset-0 group-wrapper transition-opacity duration-200 ${isOverlaySuppressed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
               {/* Overlay to dim unselected parts when a part is selected */}
               <AnimatePresence>
                 {selectedPart && (
@@ -231,7 +233,7 @@ export function PlantViewer({
       </div>
 
       {/* Floating Bottom Touch Instruction Banner */}
-      {isMobile && (
+      {isMobile && !isOverlaySuppressed && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-emerald-600 text-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-emerald-500/30 z-35 pointer-events-none flex items-center gap-1.5 text-center transition-all duration-300 select-none animate-bounce">
           <Leaf size={12} className="text-white shrink-0 animate-pulse" />
           <span className="text-[10px] font-extrabold tracking-wider uppercase leading-none">

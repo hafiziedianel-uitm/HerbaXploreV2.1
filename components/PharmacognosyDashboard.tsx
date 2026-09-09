@@ -88,6 +88,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
+  const [isShieldModalOpen, setIsShieldModalOpen] = useState<boolean>(false);
   
   // Custom Filters States
   const [selectedBioactive, setSelectedBioactive] = useState<string>("All");
@@ -409,7 +410,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
       className="flex flex-col h-screen overflow-hidden bg-stone-100 dark:bg-stone-950 transition-colors duration-300"
     >
       {/* Header */}
-      <header className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between shrink-0 shadow-sm z-10 transition-colors duration-300">
+      <header className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between shrink-0 shadow-sm z-30 transition-colors duration-300">
         <div 
           onClick={onBackToMenu}
           className={`flex items-center gap-2 sm:gap-3 ${onBackToMenu ? 'cursor-pointer hover:opacity-90 select-none' : ''}`}
@@ -475,6 +476,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               rateLimitStatus={rateLimitStatus}
               triggerHoneypotFlag={triggerHoneypotFlag}
               onSimulateSpam={handleSimulateSpam}
+              onOpenChange={setIsShieldModalOpen}
             />
 
             {/* Search Plants Toggle */}
@@ -910,6 +912,7 @@ export function PharmacognosyDashboard({ onBackToMenu }: PharmacognosyDashboardP
               onPrevPlant={handlePrevPlant}
               currentPlantIndex={filteredPlants.findIndex(p => p.id === selectedPlant.id)}
               totalPlantsCount={filteredPlants.length}
+              isOverlaySuppressed={isShieldModalOpen}
             />
           )}
         </div>

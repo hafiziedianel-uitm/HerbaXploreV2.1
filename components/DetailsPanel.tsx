@@ -2,11 +2,12 @@
 
 import { Plant, PlantPart, Compound, getCompoundBioactiveClass, getCompoundPharmacologicalActivities, getCompoundFormulationRoles } from "@/lib/data";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle, ZoomIn, ZoomOut, RotateCcw, Crosshair, Volume2, Pause, Play, Square } from "lucide-react";
+import { ArrowLeft, Beaker, Activity, Pill, ShoppingCart, Info, Dna, Maximize2, Minimize2, Headset, X, Search, Download, Network, Table, AlertCircle, Building2, Sparkles, ExternalLink, ChevronRight, HelpCircle, ZoomIn, ZoomOut, RotateCcw, Crosshair, Volume2, Pause, Play, Square, Box, Layers } from "lucide-react";
 import { fetchWithCache } from "@/lib/offlineCache";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { MassSpectrumChart, NMRSpectrumChart, NMRDataTable, CNMRSpectrumChart, CNMRDataTable } from "./SpectrumCharts";
+import { Molecular3DViewer } from "./Molecular3DViewer";
 import { useLanguage } from "@/lib/LanguageContext";
 import { translations, translateDb } from "@/lib/i18n";
 import { TextToSpeech } from "./TextToSpeech";
@@ -1704,6 +1705,7 @@ export function DetailsPanel({
   const [enlargedImage, setEnlargedImage] = useState<{ url: string; title: string } | null>(null);
   const [enlargedChart, setEnlargedChart] = useState<{ compoundName: string } | null>(null);
   const [activeSpectrumTab, setActiveSpectrumTab] = useState<'1H' | '13C'>('1H');
+  const [structureMode, setStructureMode] = useState<'2d' | '3d'>('2d');
   const { language } = useLanguage();
   const t = translations[language];
 
@@ -1841,43 +1843,91 @@ export function DetailsPanel({
             </div>
 
             <div className="space-y-8">
-              {/* 2D Structure */}
-              <section>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider flex items-center gap-2">
-                    <Beaker size={16} />
-                    {language === 'ms' ? 'Struktur 2D' : '2D Structure'}
-                  </h3>
-                  {compound.id !== "sterculia-polysaccharide" ? (
-                    <a 
-                      href={`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=2d`}
-                      download={`${compound.name}.sdf`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors"
-                    >
-                      <Download size={12} /> .sdf
-                    </a>
-                  ) : (
-                    <a 
-                      href="/sterculia-polysaccharide-2d.svg"
-                      download="sterculia-polysaccharide-2d.svg"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors"
-                    >
-                      <Download size={12} /> .svg
-                    </a>
+              {/* 2D / 3D Molecular Structure */}
+              <section className="scroll-mt-4" id="molecular-structure-section">
+                <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider flex items-center gap-2">
+                      <Beaker size={16} className="text-emerald-500" />
+                      {language === 'ms' ? 'Struktur Molekul' : 'Molecular Structure'}
+                    </h3>
+
+                    {/* Mode Toggle Switch: 2D vs 3D */}
+                    <div className="inline-flex items-center bg-stone-100 dark:bg-stone-800 p-0.5 rounded-lg border border-stone-200 dark:border-stone-700/80 shadow-xs">
+                      <button
+                        type="button"
+                        onClick={() => setStructureMode('2d')}
+                        className={`px-2.5 py-1 rounded-md text-xs font-bold flex items-center gap-1.5 transition-all ${
+                          structureMode === '2d'
+                            ? 'bg-white dark:bg-stone-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                            : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
+                        }`}
+                        title={language === 'ms' ? 'Mod Paparan Rangka 2D' : '2D Skeletal Structure Mode'}
+                      >
+                        <Layers size={13} />
+                        <span>{language === 'ms' ? 'Mod 2D' : '2D Mode'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setStructureMode('3d')}
+                        className={`px-2.5 py-1 rounded-md text-xs font-bold flex items-center gap-1.5 transition-all ${
+                          structureMode === '3d'
+                            ? 'bg-white dark:bg-stone-700 text-emerald-600 dark:text-emerald-400 shadow-xs ring-1 ring-emerald-500/20'
+                            : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
+                        }`}
+                        title={language === 'ms' ? 'Mod Paparan Molekul 3D Interaktif' : 'Interactive 3D Molecular Structure Mode'}
+                      >
+                        <Box size={13} className={structureMode === '3d' ? 'text-emerald-500' : ''} />
+                        <span>{language === 'ms' ? 'Mod 3D' : '3D Mode'}</span>
+                        <span className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] px-1 py-0.2 rounded font-mono font-bold">
+                          3D
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {structureMode === '2d' && (
+                    compound.id !== "sterculia-polysaccharide" ? (
+                      <a 
+                        href={`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(compound.name)}/SDF?record_type=2d`}
+                        download={`${compound.name}.sdf`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors border border-stone-200/50 dark:border-stone-700/50"
+                      >
+                        <Download size={12} /> 2D .sdf
+                      </a>
+                    ) : (
+                      <a 
+                        href="/sterculia-polysaccharide-2d.svg"
+                        download="sterculia-polysaccharide-2d.svg"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded-md flex items-center gap-1 transition-colors border border-stone-200/50 dark:border-stone-700/50"
+                      >
+                        <Download size={12} /> .svg
+                      </a>
+                    )
                   )}
                 </div>
-                <Structure2DImage 
-                  key={compound.id} 
-                  compound={compound} 
-                  onEnlarge={(url) => setEnlargedImage({ 
-                    url, 
-                    title: `${translateDb(compound.name, language)} - ${language === 'ms' ? 'Struktur 2D' : '2D Structure'}` 
-                  })} 
-                />
+
+                {structureMode === '2d' ? (
+                  <Structure2DImage 
+                    key={`2d-${compound.id}`} 
+                    compound={compound} 
+                    onEnlarge={(url) => setEnlargedImage({ 
+                      url, 
+                      title: `${translateDb(compound.name, language)} - ${language === 'ms' ? 'Struktur 2D' : '2D Structure'}` 
+                    })} 
+                  />
+                ) : (
+                  <Molecular3DViewer
+                    key={`3d-${compound.id}`}
+                    compound={compound}
+                    isMobile={isMobile}
+                  />
+                )}
               </section>
 
               {/* 3D Binding Interaction */}
